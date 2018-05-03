@@ -1,0 +1,108 @@
+This is BibTeX, Version 0.99d (TeX Live 2016)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: /Users/taoshuchang/1nlp/graduate/xnth97/Thesis/.texpadtmp/tjumain.aux
+A level-1 auxiliary file: body.aux
+The style file: ../references/ref.bst.bst
+A level-1 auxiliary file: appendix/paperInEnglish.aux
+A level-1 auxiliary file: appendix/paperInChinese.aux
+A level-1 auxiliary file: appendix/acknowledgements.aux
+"@" can't start a style-file command---line 1 of file ../references/ref.bst.bst
+ : 
+ : @@ -1,2543 +0,0 @@
+(Error may have been on previous line)
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Database file #1: ../references/reference.bib
+Warning--I didn't find a database entry for "zhang2010tree"
+-- BUPTThesis.bst version 0.2 (2009/01/25) by Yu Zhang.
+-- http://code.google.com/p/buptthesis/
+-- See the "userguide.pdf" manual for usage information.
+Warning--empty editor in Landauer1998AnIT
+Warning--empty booktitle in Landauer1998AnIT
+Warning--empty pages in Landauer1998AnIT
+Warning--The editor in Huang2013LearningDS is missing.
+Warning--empty editor in Huang2013LearningDS
+Warning--empty pages in Huang2013LearningDS
+Warning--The editor in Shen2014ALS is missing.
+Warning--empty editor in Shen2014ALS
+Warning--empty pages in Shen2014ALS
+Warning--The editor in Pang2016TextMA is missing.
+Warning--empty editor in Pang2016TextMA
+Warning--empty pages in Pang2016TextMA
+Warning--The editor in Wan2016MatchSRNNMT is missing.
+Warning--empty editor in Wan2016MatchSRNNMT
+Warning--empty pages in Wan2016MatchSRNNMT
+Warning--The editor in Graves2007MultidimensionalRN is missing.
+Warning--empty editor in Graves2007MultidimensionalRN
+Warning--empty pages in Graves2007MultidimensionalRN
+Warning--The editor in Cho2014LearningPR is missing.
+Warning--empty editor in Cho2014LearningPR
+Warning--empty pages in Cho2014LearningPR
+Warning--The editor in Sutton1998ReinforcementL is missing.
+Warning--empty editor in Sutton1998ReinforcementL
+Warning--empty pages in Sutton1998ReinforcementL
+Warning--empty pages in Mnih2013PlayingAW
+Warning--there's a publisher but no address in website:WWW
+Warning--there's a publisher but no address in website:Hellinger
+Warning--there's a publisher but no address in website:Shannondivergence
+Warning--empty pages in Palangi2014SemanticMW
+Warning--there's a publisher but no address in website:edit_dis
+Warning--The editor in Coulom2006EfficientSA is missing.
+Warning--empty editor in Coulom2006EfficientSA
+Warning--empty pages in Coulom2006EfficientSA
+Warning--The editor in Kocsis2006BanditBM is missing.
+Warning--empty editor in Kocsis2006BanditBM
+Warning--empty pages in Kocsis2006BanditBM
+Warning--The editor in Lorentz2008AmazonsDM is missing.
+Warning--empty editor in Lorentz2008AmazonsDM
+Warning--empty pages in Lorentz2008AmazonsDM
+Warning--The editor in Buro2009ImprovingSE is missing.
+Warning--empty editor in Buro2009ImprovingSE
+Warning--empty pages in Buro2009ImprovingSE
+Warning--The editor in Abadi2016TensorFlowAS is missing.
+Warning--empty editor in Abadi2016TensorFlowAS
+Warning--empty pages in Abadi2016TensorFlowAS
+
+Done.
+You've used 28 entries,
+            4567 wiz_defined-function locations,
+            1165 strings with 13446 characters,
+and the built_in function-call counts, 15251 in all, are:
+= -- 1649
+> -- 277
+< -- 9
++ -- 166
+- -- 83
+* -- 1335
+:= -- 1769
+add.period$ -- 84
+call.type$ -- 28
+change.case$ -- 0
+chr.to.int$ -- 0
+cite$ -- 73
+duplicate$ -- 1074
+empty$ -- 1639
+format.name$ -- 83
+if$ -- 3601
+int.to.chr$ -- 0
+int.to.str$ -- 28
+missing$ -- 0
+newline$ -- 144
+num.names$ -- 28
+pop$ -- 149
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 2
+skip$ -- 346
+stack$ -- 0
+substring$ -- 1732
+swap$ -- 231
+text.length$ -- 9
+text.prefix$ -- 0
+top$ -- 5
+type$ -- 269
+warning$ -- 45
+while$ -- 131
+width$ -- 30
+write$ -- 231
+(There was 1 error message)
