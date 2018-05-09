@@ -50,9 +50,9 @@
 
 最近，基于，在围棋领域战胜了人类高手李世石，引起了学术界的广泛关注。强化学习是机器学习的一个重要分支，一个完整的强化学习过程，可以让计算机由完全不了解任务，通过不断的尝试，从和环境的交互学习，最后找到规律，达到任务目的。强化学习算法本身就会和环境进行交互，从获得的奖励或惩罚中学习。这些奖或惩，其实就可以作为生成匹配路径的需要的大量数据，同时由于这种学习过程，强化学习在序列生成问题上表现突出，生成匹配路径本质是一种序列生成的过程，于是本文使用强化学习算法来模拟匹配路径的生成过程，从而计算匹配程度。
 
-基于上述现状，本文使用强化学习方法来建模文本匹配问题，采用了马尔科夫决策过程（Markov Decision Process，MDP）方法本文的主要贡献如下：
+基于上述现状，本文使用强化学习方法来建模文本匹配问题，采用了马尔可夫决策过程（Markov Decision Process，MDP）方法本文的主要贡献如下：
 
-针对文本匹配问题，设计了马尔科夫决策过程中的状态、动作、价值函数以及奖励函数，实现了基于价值迭算法（value iteration）的文本匹配模型，在在线问答平台 Quora 数据集训练模型，并进行优化，与经典的深度学习的文本匹配模型MatchPyramid 和 MatchSRNN 的结果进行比较，实验结果表明基于价值迭代算法的文本匹配模型，在各个评价准则下均优于其他经典文本匹配算法的效果。
+针对文本匹配问题，设计了马尔可夫决策过程中的状态、动作、价值函数以及奖励函数，实现了基于价值迭算法（value iteration）的文本匹配模型，在在线问答平台 Quora 数据集训练模型，并进行优化，与经典的深度学习的文本匹配模型MatchPyramid 和 MatchSRNN 的结果进行比较，实验结果表明基于价值迭代算法的文本匹配模型，在各个评价准则下均优于其他经典文本匹配算法的效果。
 
 \section{本文组织结构}
 本文共分为六章，每章节的内容组织如下：
@@ -61,9 +61,10 @@
 
 第二章从两个方面介绍了国内外研究现状。第一方面是关于文本匹配的相关工作，主要介绍了模，从传统方法到深度到强化学习，另一方面是强化学习的研究现状，主要介绍了强化学习的基本概念、符号定义以及相关算法，为本文之后提出的模型打下基础。符号定义
 
-第三章主要介绍（文本匹配问题 符号定义与强化学习 符号定义 MDP
+第三章主要介绍文本匹配问题的详细描述，马尔可夫决策过程和面向文本匹配问题的马尔可夫决策过程
+ 符号定义与强化学习 符号定义 MDP
 
-第四章介绍（MDP方法） 价值迭代
+第四章介绍面向问奔跑（MDP方法） 价值迭代
 
 第五章介绍（价值迭代）实验以及讨论
 
@@ -182,14 +183,14 @@ MatchPyramid\cite{Pang2016TextMA}利用匹配矩阵建模两个句子的交互�
 
 但是，和CDSSM类似，利用分层结构的CNN建模文本匹配的过程，可能会失去上下文信息，使用序列结构的RNN优势更加显著。
 
-有学者提出了MatchSRNN\cite{Wan2016MatchSRNNMT}，MatchSRNN首先是用单词交互张量即匹配矩阵表示单词级别的交互信息，然后利用二维RNN\cite{Graves2007MultidimensionalRN}递归的整合局部交互信息，最后的匹配分数是由全局交互信息计算的。单词交互张量是表达一对文本中各个词向量之间交互信息的神经张量网络。普通一维RNN的当前状态 $\vec{h}_{t}$ 是由前一时刻状态 $\vec{h}_{t-1}$ 和当前输入 $\vec{x}_{t}$决定的，而在张量网络上运行的RNN则将其扩展到了二维空间，它当前位置状态由左方、上方、对角线方向上的前一位置 $\vec{h}_{i-1,j},\vec{h}_{i,j-1},\vec{h}_{i-1,j-1}$ 与当前位置上的输入 $\vec{s}_{ij}$ 的共同决定，RNN输入如\ref{spatial_rnn}：
+有学者提出了MatchSRNN\cite{Wan2016MatchSRNNMT}，MatchSRNN首先是用单词交互张量即匹配矩阵表示单词级别的交互信息，然后利用二维RNN\cite{Graves2007MultidimensionalRN}递归的整合局部交互信息，最后的匹配分数是由全局交互信息计算的。单词交互张量是表达一对文本中各个词向量之间交互信息的神经张量网络。普通一维RNN的当前状态 $\vec{h}_{t}$ 是由前一时刻状态 $\vec{h}_{t-1}$ 和当前输入 $\vec{x}_{t}$决定的，而在张量网络上运行的RNN则将其扩展到了二维空间，它当前位置状态由左方、上方、对角线方向上的前一位置 $\vec{h}_{i-1,j},\vec{h}_{i,j-1},\vec{h}_{i-1,j-1}$ 与当前位置上的输入 $\vec{s}_{ij}$ 的共同决定，RNN输入如~\eqref{spatial_rnn}~：
 \begin{equation}
 \label{spatial_rnn}
 \vec{h}_{ij} = f(\vec{h}_{i-1,j},\vec{h}_{i,j-1},\vec{h}_{i-1,j-1},\vec{s}_{ij})
 \end{equation}
 
 
-MatchSRNN使用了RNN的变种门控循环单元\cite{Cho2014LearningPR}（Gated Recurrent Unit，GRU）GRU是LSTM的简化，只有更新门和重置门，重置门决定了如何将新的输入信息与前面的记忆相结合，更新门定义了前面记忆保存到当前时间步的量。GRU的计算方式如\ref{gru}：
+MatchSRNN使用了RNN的变种门控循环单元\cite{Cho2014LearningPR}（Gated Recurrent Unit，GRU）GRU是LSTM的简化，只有更新门和重置门，重置门决定了如何将新的输入信息与前面的记忆相结合，更新门定义了前面记忆保存到当前时间步的量。GRU的计算方式：
 \begin{equation}
 \label{gru}
 \begin{aligned}
@@ -255,7 +256,7 @@ DQN将深度卷积神经网络和Q学习结合到一起，并集成了经验回�
 相比于 AlphaGo，AlphaGo Zero 去除了棋手的落子网络，因此不需要任何先验知识；策略网络和价值网络的整合使得神经网络的复杂度降低，泛化性进一步增强，降低了硬件的资源需求，减少了训练时间。
 \begin{figure}[!htbp]\centering
 \vspace{1em}
-  \includegraphics[width=0.8\linewidth]{AlphaGo_Zero.png}
+  \includegraphics[width=0.5\linewidth]{AlphaGo_Zero.png}
   \caption{AlphaGo Zero 自我对弈训练过程} 
   \label{fig:AlphaGo_Zero}       % Give a unique label
   \vspace{1em}
@@ -274,18 +275,241 @@ AlphaGo Zero的成功证明了在没有任何先验经验的情况下，深度�
 
 目前深度学习和强化学习的结合使得强化学习的表达能力大幅度上升，为学习传统文本匹配中复杂的规则和模式带来了可能。由于目前计算机理解人类语义十分困难，因此基于模式匹配的方式在短文本匹配场景中仍然拥有巨大的价值。本文会结合强化学习和文本匹配的特点，设计使用与文本匹配的强化学习算法。
 
-\chapter{文本匹配问题}
-\section{数学描述}
-为了更好地解决文本匹配问题，本节利用数学符号形式化定义文本匹配问题。
+\chapter{面向文本匹配问题的马尔可夫决策过程建模}
+文本匹配的应用本章主要介绍了文本匹配问题的数学描述，强化学习的主要技术——马尔可夫决策过程以及面向文本匹配的算法设计。
+\section{文本匹配描述}
+为了更好地解决文本匹配问题，本节会利用数学符号形式化地定义文本匹配这个任务。
 
-\begin{figure}[htbp!]
-\centering
-\includegraphics[width=0.75\textwidth]{figures/p1p2figure.eps}
-\caption{最优$p_1, p_2$仿真结果}\label{fig:}
-\vspace{-1em}
+给定训练数据对，两个文本和一个标签： $(\mathbf{q}_1, \mathbf{d}_1, \mathbf{l}_1), (\mathbf{q}_2, \mathbf{d}_2, \mathbf{l}_2), \cdots, (\mathbf{q}_N, \mathbf{d}_N, \mathbf{l}_N)$,其中 $\mathbf{q}_i \in \mathbf{Q}$，$\mathbf{d}_i \in \mathbf{D}$为输入的一对文本，$\mathbf{l}_i \in \mathbf{L}$ 为标签，是0或1。在问答系统中，三者分别为问题、答案、答案能否回答问题；在问题复述中，三者分别为要判定是否同义的两个句子和是否同意义；在搜索引擎中，三者分别为查询、文档和是否相关。文本匹配的目标是自动学习训练数据上的匹配模型f，以便对于测试数据的每次输入，可以预测 $\mathbf{q}_i$ 和 $\mathbf{d}_i$ 的匹配程度 $\mathbf{r}_i$ ，可以设定一个阈值，若高于该阈值就认为为匹配，低于该阈值就认为不匹配。
+
+在匹配的过程中，有一些关键步骤可以形式化的表述出来，以便
+
+\section{马尔可夫决策过程}
+强化学习研究的是如何根据环境的反馈，作出行动，从而最大化总收益。详细过程如下：在某一时刻 $t$ ，主体会处于状态 $s_t$，并从环境中得到观测 $o_t$，根据观测和行动利用策略 $\pi_\theta(a_t|o_t)$ 或者 $\pi_\theta(a_t|s_t)$作出行动 $a_t$，环境根据主体状态 $s_t$ 以及行动 $a_t$ 通过转移概率分布函数 $p(s_{t+1}| s_t, a_t)$ 得到状态 $s_{t+1}$，通过奖励函数 $r(s, a)$ 得到奖励 $r_t$，周而复始。而当环境是完全可观测的时候，它通常被形式化的描述为为马尔可夫决策过程（Markov Decision Process，MDP）几乎所有。强化学习中马尔可夫决策过程可以解决大部分问题\cite{Sutton1998ReinforcementL}，本小节会简要介绍马尔可夫决策过程及相关概念。
+
+\subsection{马尔可夫相关概念}
+
+在描述马尔可夫决策过程前，首先需要定义马尔可夫性质，一个状态有马尔可夫性质，当且仅当它满足式~\eqref{Markov}~，即在给定现在状态时，它与过去状态（即该过程的历史路径）是无关的。当前的状态已经包含了历史所有相关信息的状态，只要已知当前状态，可以丢弃所有历史信息，因为该状态已经足够预测未来。
+\begin{equation}
+\label{Markov}
+\begin{aligned}
+P[s_{t+1}|s_t]=P[s_{t+1}|s_1,\cdots,s_t]
+\end{aligned}
+\end{equation}
+
+马尔科夫性描述的是每个状态的性质，马尔可夫链（或马尔可夫过程）$M=<\mathcal{S}, \mathcal{P}>$描述了一个状态序列，其中$\mathcal{S}$是状态空间，$s_t \in \mathcal{S}$是满足马尔可夫性质的随机状态，$\mathcal{P}$是一个状态转移概率矩阵，转移概率$p(s_{t+1}|s_t)$ 确定了在当前状态下转移到下一个状态的概率。令转移概率 $\mathcal{P}_{s, s'}=\mathbb{P}[S_{t+1}=s'|S_t=s]$，则这些概率组成了概率转移矩阵 $\mathcal{P}$。马尔科夫链具有马尔科夫性，即转移概率只与当前的状态有关。
+
+马尔可夫决策过程是马尔可夫链在决策环境中的扩展 $M=<\mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R}, \gamma>$。其中：状态空间 $\mathcal{S}$ 与马尔科夫链类似；行动空间 $\mathcal{A}$ 即行动的集合；转移概率 $\mathcal{P}$ 不仅受到当前状态的影响，还受到行动 $a\in \mathcal{A}$ 的影响，定义为$\mathcal{P}_{s, s'}^{a}=\mathbb{P}[S_{t+1}=s'|s_t=s, A=a]$；$\mathcal{R}$ 为奖励函数，定义为$\mathcal{R}_{s}^{a}=\mathbb{E}[R_{t+1}|S_t=s, A_t=a]$，是一个 $\mathcal{S}\times A\to \mathbb{R}$ 的映射；$\gamma \in [0,1]$是衰减因子。
+
+\begin{figure}[!htbp]\centering
+\vspace{1em}
+  \includegraphics[width=0.9\linewidth]{figures/MDP.jpg}
+  \caption{马尔可夫决策过程} 
+  \label{fig:MDP}       % Give a unique label
+  \vspace{1em}
 \end{figure}
 
 
+马尔可夫决策过程，按如下进行：主体初始状态$s_0$，然后按策略执行动作$a_0$，根据转移概率$\mathcal{P}_{s_0, s_1}^{a_0}$，跳转到下一个状态$s_1$，再执行动作$a_1$，转移到$s_2$，如图
+\begin{figure}[!htbp]\centering
+\vspace{1em}
+  \includegraphics[width=0.9\linewidth]{figures/MDP_trans}
+  \caption{MDP状态转移} 
+  \label{fig:MDP}       % Give a unique label
+  \vspace{1em}
+\end{figure}
+
+考虑一个有限长度的轨迹 $\tau=\{s_1,a_1,...s_t,a_t\}$，它产生的概率如式~\eqref{finite}~
+\begin{equation}
+\label{finite}
+\begin{aligned}
+p_\theta(\tau) = p(s_1)\prod_{t=1}^T \pi_\theta(a_t|s_t)p(s_{t+1}|s_t,a_t)
+\end{aligned}
+\end{equation}
+
+初始状态 $s_1$ 往往是确定的。根据马尔科夫性，后面每个时刻的行动和状态都是由当前的行动确定的。我们希望优化式~\eqref{optimization}~以最大化总收益函数关于轨迹的期望。
+\begin{equation}
+\label{optimization}
+\begin{aligned}
+\theta^* = \arg\max_\theta E_{\tau\sim p_\theta(\tau)}[\sum_t r(s_t, a_t)]
+\end{aligned}
+\end{equation}
+
+
+对于有限长度的轨迹，我们在求解 $\theta^*$ 时只需要关注马尔科夫链在一个时间点上的边际分布；对于无限长度的轨迹，根据马尔科夫性，有式~\eqref{MDP_finite}~：
+\begin{equation}
+\label{MDP_finite}
+\begin{aligned}
+\left[\begin{array}{l}\mathbf{s}_{t+k}\\\mathbf{a}_{t+k}\end{array}\right]=\mathcal{P}\left[\begin{array}{l}\mathbf{s}_{t+k-1}\\\mathbf{a}_{t+k-1}\end{array}\right]=...=\mathcal{P}^k\left[\begin{array}{l}\mathbf{s}_{t}\\\mathbf{a}_{t}\end{array}\right]
+\end{aligned}
+\end{equation}
+
+对于无限长度的问题，当到达平稳分布时，我们可以对目标进行平均，如式~\eqref{infinite}~：
+\begin{equation}
+\label{infinite}
+\begin{aligned}
+\theta^*=\arg\max_\theta\frac{1}{T}\sum_{t=1}^T\mathbf{E}_{(\mathbf{s}_t,\mathbf{a}_t)\sim p_\theta(\mathbf{s}_t,\mathbf{a}_t)}r(\mathbf{s}_t,\mathbf{a}_t)\rightarrow \mathbf{E}_{(\mathbf{s},\mathbf{a})\sim p_\theta(\mathbf{s},\mathbf{a})}r(\mathbf{s},\mathbf{a})
+\end{aligned}
+\end{equation}
+
+马尔可夫决策过程能够解决大部分强化学习问题，而一个完整的强化学习的训练过程，如图\ref{fig:RL_process}一般包含 3 个部分：
+
+1. 生成样本。在模拟器中运行我们当前的策略并收集轨迹(trajectory)样本。轨迹的收集即主体和环境的交互过程：在 $t$ 时刻，我们从环境得到观测信息 $o_t$，在此观测信息下根据策略 $\pi_\theta(a_t|o_t)$ 得到当前的行动 $a_t$，根据系统的转移概率 $p(s_{t+1}|s_t, a_t)$ 得到下一个状态 $s_{t+1}$。在做出当前的行动之后，我们会得到收益 $r(s_t,a_t)$, 简记为 $r_t$ 。我们的目标就是最大化得到的总收益。
+
+2. 收益估计。不同的算法在这一步的表现不尽相同。对于策略学习来说，就是策略评估；对于基于模型的增强学习算法，就是模型拟合。
+
+3. 改进策略。根据上一步得到的结果改进策略，再执行第一步，循环往复。
+\begin{figure}[!htbp]\centering
+\vspace{1em}
+  \includegraphics[width=0.6\linewidth]{figures/RL_process.jpg}
+  \caption{强化学习算法一般步骤} 
+  \label{fig:RL_process}       % Give a unique label
+  \vspace{1em}
+\end{figure}
+
+\subsection{马尔可夫决策过程求解}
+求解马尔可夫决策过程，除上述五元组外，还需要定义一些概念：
+\begin{itemize}
+\item 策略$\pi$：$\pi(a|s)=\mathbb[A_t=a|S_t=s]$，根据给定状态的行动分布。策略能够完全决定主体的行为。
+\item 回报$G_t$：$G_t = R_{t+1} + \gamma R_{t+2} + ... = \sum_{k=0}^\infty \gamma^kR_{t+k+1}$ 从时间步$t$开始累积的经过衰减的总奖励，即奖励期望。
+\item 价值函数$v(s)$：$v(s)=\mathbb{E}_{pi}[G_t|S_t=s]$ 从状态$s$开始，遵循策略$\pi$的预期回报，价值函数是一个状态在未来的价值，即回报的期望。
+%\item 状态价值函数$v_{\pi}(s)$：$v_{\pi}(s)=\mathbb{E}_{\pi}[G_t|S_t=s]$ 根据状态$s$和策略$\pi$确定的状态价值。
+%\item 行为价值函数$q_{\pi}(s,a)$：$q_{\pi}(s)=\mathbb{E}_{pi}[G_t|S_t=s,A_t=a]$ 从状态$s$开始，采取行动$a$，遵循策略$\pi$的预期回报
+\end{itemize}
+值函数可被分为两部分，立即奖励$R_{t+1}$和经过衰减的后继状态价值：
+\begin{equation}\label{eq:Bellman}
+\begin{aligned}
+v(s) & = \mathbb{E}[G_t|S_t = s] \\
+     & = \mathbb{E}[R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3}+...|S_t=s]\\
+     & = \mathbb{E}[R_{t+1} + \gamma(R_{t+2} + \gamma R_{t+3}+...)|S_t=s]\\
+     & = \mathbb{E}[R_{t+1} + \gamma G_{t+1}|S_t=s]\\
+     & = \mathbb{E}[R_{t+1} + \gamma v(S_{t+1})|S_t=s]\\
+\end{aligned}
+\end{equation}
+
+~\eqref{eq:Bellman}~被称为Bellman方程\cite{bellman1957markovian}，它表明价值函数可以通过迭代计算得到，马尔可夫决策过程的目的就是通过迭代最大化$v(s)$。
+
+通过Bellman方程，可以得到~\eqref{bellman2}~，通过迭代计算价值函数来优化策略，收敛到最优。
+\begin{equation}\label{bellman2}
+\begin{aligned}
+v_{k+1}(s) &= \mathbb{E}[R_{t+1}+\gamma v_k(S_{t+1})|S_t=s]\\
+		   &= \sum_a \pi(a|s) \sum_{s',r}p(s',r|s,a)[r+\gamma v_k(s')]	
+\end{aligned}		   
+\end{equation}
+
+策略迭代一般分为策略评 估和策略改进。策略评估（Policy Evaluation）：利用当前策略产生新样本；策略改进（Policy Improvement）：使用新样本更新当前策略，最终收敛到最优。在策略评估时需要知道环境的状态转移概率，因此策略迭代需要依赖模型。
+
+\begin{algorithm}[H]
+    \small
+    \caption{policy iteration}\label{alg:policy_iteration}
+    \begin{algorithmic}
+        \STATE Step 1. Initialization
+        \STATE $V(s) \in \mathbb{R}$ and $\pi(s) \in \mathcal{A}(s)$ aribitrarily for all $s \in \mathcal{S}$
+        \STATE Step 2. Policy Evaluation
+        \REPEAT
+        \STATE $\Delta \leftarrow 0$
+        \FOR {each $s \in \mathcal{S}$}
+        \STATE $v \leftarrow V(s)$
+        \STATE $V(s)\leftarrow \sum_{s', r} p(s', r|s, \pi(s))[r + \gamma V(s')]$
+        \STATE $\Delta \leftarrow \max(\Delta, |v-V(s)|$
+        \ENDFOR
+
+        \UNTIL{$\Delta < \theta$}
+
+        \STATE Step 3. Policy Improvement
+        \STATE policy-stable $\leftarrow  true$
+        \FOR {each $s \in \mathcal{S}$}
+        \STATE $a \leftarrow \pi(s)$
+        \STATE $\pi(s) \leftarrow \arg\max_a\sum_{s', r}p(s', r|s, \pi(s))[r + \gamma V(s')]$
+        \STATE If $a \neq \pi(s)$ then policy-stable $\leftarrow  false$
+        \ENDFOR
+        \STATE If policy-stable, then stop and return V and $\pi$; else go to 2
+    \end{algorithmic}
+\end{algorithm}
+
+策略迭代算法每次都要进行策略评估和改进，大大增加了算法的训练时间，由于对文本匹配问题对策略的改进和对值函数的改进是一致的，所以可以将策略改进视为对值函数的改进。
+
+通过Bellman方程，我们可以得到：
+
+\begin{equation}\label{bellman_val}
+	\begin{aligned}
+		v_*(s) &= \mathbb{E}[R_{t+1}+\gamma v_*(S_{t+1})|S_t=s,A_t=a]
+			   &= \max_a \sum_{s',r}p(s', r|s, a)[r+\gamma v_k(s')]
+	\end{aligned}
+\end{equation}
+
+从\eqref{bellman_val}}可以发现，我们可以通过Bellman最优模型来更新值函数收敛，最后收敛可以得到当前策略的最优值$v_*$
+
+\section{面向文本匹配的马尔可夫决策过程建模}
+
+
+
+
+\chapter{基于价值迭代的文本匹配算法实现}
+
+
+%\section{评价指标}
+%本节介绍用于文本匹配算法的评价指标。在本文中，文本匹配可被看作一个分类问题，判断一个二分类预测模型优劣的评价指标主要有：精确率（Precision），召回率（Recall），F值（F-score），准确率（Accuracy，ACC），受试者工作特征曲线（Receiver Operating Characteristic，ROC），AUC（Area Under Curve of ROC）。
+%本文使用的是准确率，F1和AUC这三个指标。
+%
+%\begin{figure}[!htbp]
+%\vspace{1em}
+%\centering
+%  \includegraphics[width=0.9\linewidth]{figures/matrix}
+%  \caption{混淆矩阵}
+%  \label{fig:Con_matrix}       % Give a unique label
+%\vspace{1em}
+%\end{figure}
+%
+%图\ref{fig:Con_matrix}是混淆矩阵（Confusion Matrix）。本节出现的所有指标都是以该矩阵为依据。
+%
+%准确率$\text{ACC}$是计算样本被正确预测的次数占总样本的比例，如式~\eqref{acc_eq}~。准确率越高，算法在该指标上表现越好，当准确率为1时，该评价指标达到最优值。
+%\begin{equation}
+%\label{acc_eq}
+%\begin{aligned}
+%\text{ACC}=\frac{\text{TP}+\text{TN}}{\text{TP}+\text{FP}+\text{TN}+\text{FN}}
+%\end{aligned}
+%\end{equation}
+%
+%精确率是被模型预测为正的样本中，实际为正样本的比例，如式~\eqref{precision_eq}~，召回率是实际为正的样本中，正确预测为正样本的比例，如式~\eqref{recall_eq}~。
+%\begin{equation}
+%\label{precision_eq}
+%\begin{aligned}
+%\text{P}=\frac{\text{TP}}{\text{TP}+\text{FP}}
+%\end{aligned}
+%\end{equation}
+%\begin{equation}
+%\label{recall_eq}
+%\begin{aligned}
+%\text{R}=\frac{\text{TP}}{\text{TP}+\text{FP}}
+%\end{aligned}
+%\end{equation}
+%
+%$\text{F}_1$是精确率和召回率的调和平均数，相当于精确率和召回率的综合评价指标，如式~\eqref{f1_eq}~。$\text{F}_1$越大，算法在该指标上表现越好，当$\text{F}_1$为1时，该评价指标达到最优。
+%\begin{equation}
+%\label{f1_eq}
+%\begin{aligned}
+%\text{F}_1 &= \frac{2}{\frac{1}{P}+\frac{1}{R}} \\
+%\text{F}_1 &= \frac{2*P*R}{P+R}
+%\end{aligned}
+%\end{equation}
+%
+%AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由两个变量真正样本率TPR（True Positive Rate）和假正样本率FPR(False Positive Rate)绘制，其中TPR和FPR如式~\eqref{tpr_fpr}~，分别反映了正样本和负样本的分类准确率，AUC越大，算法在该指标上表现越好，当AUC为1时，该评价指标达到最优。
+%\begin{equation}
+%\label{tpr_fpr}
+%\begin{aligned}
+%\text{TPR} &= \frac{TP}{TP+FN} \\
+%\text{FPR} &= \frac{FP}{FP+TN}
+%\end{aligned}
+%\end{equation}
+%
+
+
+
+
+
+
+\chapter{基于蒙特卡洛树搜索的文本匹配建模及实现}
 
 很多和计算机专业背景相关的同学都会使用到代码环境，使用~\verb|\verb|~指令或者是~\verb|verbatim|~环境固然是一种选择，但是比不上专门的~lstlisting~环境这么专业。
 
