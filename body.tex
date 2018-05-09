@@ -471,7 +471,7 @@ v_{k+1}(s) &= \mathbb{E}[R_{t+1}+\gamma v_k(S_{t+1})|S_t=s]\\
 
 \section{面向文本匹配的马尔可夫决策过程建模}
 \label{sec:TM_MDP}
-本节将强化学习建模为一个马尔可夫决策过程。
+本节将强化学习建模为一个强化学习过程。
 
 在\ref{sec:text_matching} 节，中我们介绍了MatchSRNN\cite{Wan2016MatchSRNNMT} 算法。MatchSRNN 使用匹配矩阵中提取句子间的交互信息，利用二维 GRU 提取单个句子和句子之间的序列信息。 在二维 GRU计算完成后，通过二维 GRU 的状态，我们可以回溯出一条路径。
 图\ref{fig:LD_dis}表示了对 $Q$=How to get rid of memory stick error of my
@@ -491,12 +491,44 @@ stick but what is the error message you are receiving. 得到的匹配矩阵进�
 \begin{figure}[!htbp]\centering
 \vspace{1em}
   \includegraphics[width=0.5\linewidth]{figures/match_MDP}
-  \caption{文本匹配路经计算过程} 
+  \caption{文本匹配路径计算过程} 
   \label{fig:match_MDP}       % Give a unique label
   \vspace{1em}
 \end{figure}
 
-和MatchPyramid以及MatchSRNN类似，我们同样会使用匹配矩阵的概念。从匹配矩阵左上角出发，根据当前位置，确定行动方向，直到走到右下角为止
+和MatchPyramid以及MatchSRNN类似，这里会使用匹配矩阵的概念。从匹配矩阵左上角出发，根据当前位置，确定行动方向，直到走到右下角为止，会得到一条匹配路径。然后需要建立一个判别模型，根据匹配路径判断是否匹配。
+
+首先描述文本匹配算法中获得匹配路径的过程，该过程为一个马尔可夫决策过程。其输入为一个句子对$Q=\{\mathbf{u}_1, \mathbf{u}_2,\cdots,\mathbf{u}_n\}, D=\{\mathbf{v}_1, \mathbf{v}_2,\cdots,\mathbf{v}_m\}$
+
+\begin{enumerate}
+	\item 状态$\mathcal{S}$：将在 $t$ 时刻的状态 $s_t$ 定义为从当前位置开始向前看的 $m$ 个单词：
+	\begin{equation}\label{MDP_state}
+	\begin{aligned}
+		s_t &= \{[\mathbf{u}_{q_t}, \mathbf{v}_{d_t}], [\mathbf{u}_{1+q_t},\mathbf{v}_{1+d_t}] \cdots, [\mathbf{u}_{m+q_t}, \mathbf{v}_{m+d_t}]\}
+	\end{aligned}
+	\end{equation}
+	式\eqref{MDP_state}中，$q_t$ 和$d_t$表示当前位置。
+	\item 动作$\mathcal{A}$：在每个时间$t$：向包括右、下、右下三个方向中的某个移动一步。
+	\item 状态转移函数$\mathcal{T}(S,\mathcal{A})$：状态转移函数$\mathcal{T}:S\times \mathcal{A}\rightarrow S$ 被定义为：
+	\begin{equation}\label{MDP_state}
+	\begin{aligned}
+		(q_{t+1}, d_{t+1}) =
+\begin{cases}
+(q_{t} + 1, d_{t}) &\text{if goes down} \\
+(q_{t}, d_{t} + 1) &\text{if goes right}  \\
+(q_{t} + 1, d_{t} + 1) &\text{if goes obliquely}
+\end{cases} \\
+	\end{aligned}
+	\end{equation}
+	\begin{equation}\label{MDP_state}
+	\begin{aligned}
+		s_{t+1} = \mathcal{T}(s_t,a_t)=[\mathbf{u}_{q_{t+1}},\mathbf{v}_{d_{t+1}}],[\mathbf{u}_{1+q_{t+1}},\mathbf{v}_{1+d_{t+1}}],\cdots,[\mathbf{u}_{m+q_{t+1}},\mathbf{v}_{m+d_{t+1}}]
+	\end{aligned}
+	\end{equation}
+	\item 在每个时间$t$：系统根据当前状态选择一个行动（移动方向），并根据方向移动到下一个位置，状态随之转移：根据当前的位置($q_{t+1},d_{t+1}$)更新未来状态，完成转移后，再根据当前状态继续移动。
+	\item 值函数$V$：值函数$V: S\rightarrow \mathbb{R}$是对当前模型是否能够得到正确结果的预测。值函数需要不断更新以更加准确的得到预测结果。本节所提出的值函数的目标是预测模型是否能够预测正确
+
+\end{enumerate}
 
 \chapter{基于价值迭代的文本匹配算法实现}
 
