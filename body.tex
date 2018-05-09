@@ -276,7 +276,7 @@ AlphaGo Zero的成功证明了在没有任何先验经验的情况下，深度�
 
 目前深度学习和强化学习的结合使得强化学习的表达能力大幅度上升，为学习传统文本匹配中复杂的规则和模式带来了可能。由于目前计算机理解人类语义十分困难，因此基于模式匹配的方式在短文本匹配场景中仍然拥有巨大的价值。本文会结合强化学习和文本匹配的特点，设计使用与文本匹配的强化学习算法。
 
-\chapter{面向文本匹配问题的马尔可夫决策过程建模}
+\chapter{文本匹配问题的马尔可夫决策过程建模}
 文本匹配的应用本章主要介绍了文本匹配问题的数学描述，强化学习的主要技术——马尔可夫决策过程以及面向文本匹配的算法设计。
 \section{文本匹配描述}
 为了更好地解决文本匹配问题，本节会利用数学符号形式化地定义文本匹配这个任务。
@@ -486,7 +486,17 @@ stick but what is the error message you are receiving. 得到的匹配矩阵进�
   \vspace{1em}
 \end{figure}
 
+既然MatchSRNN通过回溯可以得到一条路径，那么一个直接的想法就是不通过二维GRU的方式直接获得一条路径，利用这条路径判断这两个句子是否匹配。
 
+\begin{figure}[!htbp]\centering
+\vspace{1em}
+  \includegraphics[width=0.5\linewidth]{figures/match_MDP}
+  \caption{文本匹配路经计算过程} 
+  \label{fig:match_MDP}       % Give a unique label
+  \vspace{1em}
+\end{figure}
+
+和MatchPyramid以及MatchSRNN类似，我们同样会使用匹配矩阵的概念。从匹配矩阵左上角出发，根据当前位置，确定行动方向，直到走到右下角为止
 
 \chapter{基于价值迭代的文本匹配算法实现}
 
