@@ -75,6 +75,7 @@
 \chapter{相关工作与国内外研究现状}
 
 \section{文本匹配研究相关工作}
+\label{sec:text_matching}
 文本匹配是自然语言处理中的经典任务，早期文本匹配的研究大多是基 向量空间模型，如将文本从稀疏的高维空间映射到一个低维的向量空间的潜在语义分析模型\cite{Landauer1998AnIT}（Latent Semantic Analysis，LSA），主题模型\cite{Blei2003LatentDA}（Latent Dirichlet Allocation，LDA），然而这种利用统计推断发现数据潜在模式的方式在短文本上表现不好，也不能精准建模文本匹配中的语义相关程度。研究学者将机器翻译的思想引入文本匹配，Berger和Lafferty使用统计机器翻译模型计算文本间的匹配程度，将两个句子的匹配视为不同语言的翻译问题，实现了近义词之间的相互匹配映射。之后又有研究者从语义紧密度等度量出发来规避结构转义问题，从对网页打关键词标签来解决非对称匹配问题等，但这样人工提取特征的代价很大，无法挖掘隐含在大量数据中含义不明显的特征，同时还会导致逻辑非常复杂。
 
 近年来，随着计算机计算能力的不断提升，互联网数据呈爆炸式增长，深度学习依靠利用大规模数据与高性能计算的优势在语音识别、计算机视觉均取得了突出进展，自然语言处理也成为了当前深度学习研究的热点领域。有不少研究学者们使用深度学习方法来解决文本匹配问题。
@@ -139,7 +140,7 @@
 
 LSTM可保留误差，用于沿时间和层进行反向传递。LSTM将误差保持在恒定的水平，让循环网络能够进行许多个时间步的学习（超过1000个时间步），从而打开了建立远距离因果联系的通道。由于本文提出的算法也用到了LSTM，接下来会重点介绍一下LSTM的工作原理。LSTM的关键就是细胞状态，它类似于传送带。直接在整个链上运行，只有一些少量的线性交互。信息在上面流传保持不变会很容易。LSTM 有通过“门”的结构来去除或者增加信息到细胞状态的能力。门是一种让信息选择式通过的方法，包含一个 sigmoid 神经网络层和一个pointwise乘法操作。
 
-LSTM 利用忘记门（forget gate）决定会从神经单元状态中丢弃的信息，利用输入门（input gate）确定被存放在细胞状态中的新信息，利用输出门（forget gate）确定输出的信息：
+LSTM 利用忘记门（FORget gate）决定会从神经单元状态中丢弃的信息，利用输入门（input gate）确定被存放在细胞状态中的新信息，利用输出门（FORget gate）确定输出的信息：
 \begin{equation}
 \label{LSTM_eq}
 \begin{aligned}
@@ -214,7 +215,7 @@ MatchSRNN用GRU遍历匹配矩阵，计算了每个门在三个方向上的值�
 
 
 \section{强化学习研究现状}
-强化学习是机器学习中与监督学习、非监督学习并列的一个重要研究领域，它的本质是解决序列决策的问题，即自动进行决策，并且可以做连续决策\cite{Sutton1998ReinforcementL}。和监督学习给定标注不同，强化学习给定的是一个奖励函数，主体（agent）以试错（trial-and-error）的机制与环境进行交互，最终目标是使主体在与环境交互中得到最大的累计奖励。这类算法有三个特征：闭环性，学习系统产生的行为会影响到后续的输出；无监督，学习对象只能通过学习去得这这些信息；延时性，行动（action）产生的结果，包括奖励（reward），需要很多个时间周期才能显现出来。强化学习中最基本的要素是主体和环境，除了这二者之外，还有四个要素策略、奖励信号、价值函数、对环境的建模（model）。其中：
+强化学习是机器学习中与监督学习、非监督学习并列的一个重要研究领域，它的本质是解决序列决策的问题，即自动进行决策，并且可以做连续决策\cite{Sutton1998ReinFORcementL}。和监督学习给定标注不同，强化学习给定的是一个奖励函数，主体（agent）以试错（trial-and-error）的机制与环境进行交互，最终目标是使主体在与环境交互中得到最大的累计奖励。这类算法有三个特征：闭环性，学习系统产生的行为会影响到后续的输出；无监督，学习对象只能通过学习去得这这些信息；延时性，行动（action）产生的结果，包括奖励（reward），需要很多个时间周期才能显现出来。强化学习中最基本的要素是主体和环境，除了这二者之外，还有四个要素策略、奖励信号、价值函数、对环境的建模（model）。其中：
 \begin{itemize}
   \item 策略（Policy，$\pi$）定义了主体在给定时间内的行为方式，是从环境到这些状态下采取行动的映射，是强化学习主体的核心，可能是简单函数或查找表，也可能是随机的；
 
@@ -285,7 +286,7 @@ AlphaGo Zero的成功证明了在没有任何先验经验的情况下，深度�
 在匹配的过程中，有一些关键步骤可以形式化的表述出来，以便
 
 \section{马尔可夫决策过程}
-强化学习研究的是如何根据环境的反馈，作出行动，从而最大化总收益。详细过程如下：在某一时刻 $t$ ，主体会处于状态 $s_t$，并从环境中得到观测 $o_t$，根据观测和行动利用策略 $\pi_\theta(a_t|o_t)$ 或者 $\pi_\theta(a_t|s_t)$作出行动 $a_t$，环境根据主体状态 $s_t$ 以及行动 $a_t$ 通过转移概率分布函数 $p(s_{t+1}| s_t, a_t)$ 得到状态 $s_{t+1}$，通过奖励函数 $r(s, a)$ 得到奖励 $r_t$，周而复始。而当环境是完全可观测的时候，它通常被形式化的描述为为马尔可夫决策过程（Markov Decision Process，MDP）几乎所有。强化学习中马尔可夫决策过程可以解决大部分问题\cite{Sutton1998ReinforcementL}，本小节会简要介绍马尔可夫决策过程及相关概念。
+强化学习研究的是如何根据环境的反馈，作出行动，从而最大化总收益。详细过程如下：在某一时刻 $t$ ，主体会处于状态 $s_t$，并从环境中得到观测 $o_t$，根据观测和行动利用策略 $\pi_\theta(a_t|o_t)$ 或者 $\pi_\theta(a_t|s_t)$作出行动 $a_t$，环境根据主体状态 $s_t$ 以及行动 $a_t$ 通过转移概率分布函数 $p(s_{t+1}| s_t, a_t)$ 得到状态 $s_{t+1}$，通过奖励函数 $r(s, a)$ 得到奖励 $r_t$，周而复始。而当环境是完全可观测的时候，它通常被形式化的描述为为马尔可夫决策过程（Markov Decision Process，MDP）几乎所有。强化学习中马尔可夫决策过程可以解决大部分问题\cite{Sutton1998ReinFORcementL}，本小节会简要介绍马尔可夫决策过程及相关概念。
 
 \subsection{马尔可夫相关概念}
 
@@ -404,7 +405,7 @@ v_{k+1}(s) &= \mathbb{E}[R_{t+1}+\gamma v_k(S_{t+1})|S_t=s]\\
     \caption{policy iteration}\label{alg:policy_iteration}
     \begin{algorithmic}
         \STATE Step 1. Initialization
-        \STATE $V(s) \in \mathbb{R}$ and $\pi(s) \in \mathcal{A}(s)$ aribitrarily for all $s \in \mathcal{S}$
+        	\STATE $V(s) \in \mathbb{R}$ and $\pi(s) \in \mathcal{A}(s)$ arbitrarily FOR all $s \in \mathcal{S}$
         \STATE Step 2. Policy Evaluation
         \REPEAT
         \STATE $\Delta \leftarrow 0$
@@ -438,10 +439,52 @@ v_{k+1}(s) &= \mathbb{E}[R_{t+1}+\gamma v_k(S_{t+1})|S_t=s]\\
 	\end{aligned}
 \end{equation}
 
-从\eqref{bellman_val}}可以发现，我们可以通过Bellman最优模型来更新值函数收敛，最后收敛可以得到当前策略的最优值$v_*$
+从\eqref{bellman_val}可以发现，我们可以通过Bellman最优模型来更新值函数收敛，最后收敛可以得到当前策略的最优值$v_*$。
+
+\begin{algorithm}[!htbp]
+    \small
+    \caption{value iteration}\label{alg:value_iteration}
+    \begin{algorithmic}
+        \STATE Initialization array $V$ arbitrarily
+        \REPEAT
+        \STATE $\Delta \leftarrow 0$
+        \FOR {each $s \in \mathcal{S}$}
+        \STATE $v \leftarrow V(s)$
+        \STATE $V(s)\leftarrow \max_a\sum_{s', r} p(s', r|s, a)[r + \gamma V(s')]$
+        \STATE $\Delta \leftarrow max(\Delta, |v-V(s)|$
+        \ENDFOR
+        \UNTIL {$\Delta < \theta$}
+
+        \STATE Output a deterministic policy, $\pi$ such that
+        \STATE $\pi(s) = \arg\max_a\sum_{s', r} p(s', r|s, a)[r + \gamma V(s')]$
+    \end{algorithmic}
+\end{algorithm}
+
+
+
+相比于算法~\ref{alg:policy_iteration}~，值迭代算法~\ref{alg:value_iteration}~避免了策略评估部分的计算量，降低了算法的运行时间，有效地提高了算法的运行效率。
+
+我们发现无论是算法 \ref{alg:policy_iteration} 还是 \ref{alg:value_iteration}，每次都是选择概率或者是值最高的行为，这种策略被称为利用（exploitaion）。与之对应的，如果我们每次都根据概率或者值的分布进行采样（sampling），根据采样的结果采取行动，这种策略被称为探索（exploration）。探索的优势在于当信息匮乏时，可以取得较好的效果；利用的优势在于效率很高，但只有在信息足够充足的情况下才会有效。
+
+探索和利用各有优势，将二者结合的算法被称为$\epsilon$-贪心算法。我们在每次选择行动的时候，都以$\epsilon$的概率进行探索，以$1-\epsilon$的概率进行利用。可以通过 $\epsilon$ 的调整在算法的不同阶段达到不同的效果。
+
 
 \section{面向文本匹配的马尔可夫决策过程建模}
+\label{sec:TM_MDP}
+本节将强化学习建模为一个马尔可夫决策过程。
 
+在\ref{sec:text_matching} 节，中我们介绍了MatchSRNN\cite{Wan2016MatchSRNNMT} 算法。MatchSRNN 使用匹配矩阵中提取句子间的交互信息，利用二维 GRU 提取单个句子和句子之间的序列信息。 在二维 GRU计算完成后，通过二维 GRU 的状态，我们可以回溯出一条路径。
+图\ref{fig:LD_dis}表示了对 $Q$=How to get rid of memory stick error of my
+sony cyber shot?, $D$=You might want to try to FORmat the memory
+stick but what is the error message you are receiving. 得到的匹配矩阵进行回溯得到的路径。
+
+\begin{figure}[!htbp]\centering
+\vspace{1em}
+  \includegraphics[width=0.6\linewidth]{figures/LD_dis}
+  \caption{MatchSRNN的回溯路径} 
+  \label{fig:LD_dis}       % Give a unique label
+  \vspace{1em}
+\end{figure}
 
 
 
