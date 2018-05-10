@@ -431,10 +431,9 @@ v_{k+1}(s) &= \mathbb{E}[R_{t+1}+\gamma v_k(S_{t+1})|S_t=s]\\
 策略迭代算法每次都要进行策略评估和改进，大大增加了算法的训练时间，由于对文本匹配问题对策略的改进和对值函数的改进是一致的，所以可以将策略改进视为对值函数的改进。
 
 通过Bellman方程，我们可以得到：
-
 \begin{equation}\label{bellman_val}
 	\begin{aligned}
-		v_*(s) &= \mathbb{E}[R_{t+1}+\gamma v_*(S_{t+1})|S_t=s,A_t=a]
+		v_*(s) &= \mathbb{E}[R_{t+1}+\gamma v_*(S_{t+1})|S_t=s,A_t=a] \\
 			   &= \max_a \sum_{s',r}p(s', r|s, a)[r+\gamma v_k(s')]
 	\end{aligned}
 \end{equation}
@@ -476,9 +475,8 @@ v_{k+1}(s) &= \mathbb{E}[R_{t+1}+\gamma v_k(S_{t+1})|S_t=s]\\
 \subsection{基于马尔可夫决策过程的匹配路径建模}
 
 在\ref{sec:text_matching} 节，中我们介绍了MatchSRNN\cite{Wan2016MatchSRNNMT} 算法。MatchSRNN 使用匹配矩阵中提取句子间的交互信息，利用二维 GRU 提取单个句子和句子之间的序列信息。 在二维 GRU计算完成后，通过二维 GRU 的状态，我们可以回溯出一条路径。
-图\ref{fig:LD_dis}表示了对 $Q$=How to get rid of memory stick error of my
-sony cyber shot?, $D$=You might want to try to FORmat the memory
-stick but what is the error message you are receiving. 得到的匹配矩阵进行回溯得到的路径。
+图\ref{fig:LD_dis}表示了对 $Q$=How to get rid of memory stick error of my sony cyber shot?, $D$=You might want to try to FORmat the memory
+stick but what is the error message you are receiving. 得到的匹配矩阵进行回溯得到的路径，如图\ref{fig:LD_dis}：
 
 \begin{figure}[!htbp]\centering
 \vspace{1em}
@@ -488,7 +486,7 @@ stick but what is the error message you are receiving. 得到的匹配矩阵进�
   \vspace{1em}
 \end{figure}
 
-既然MatchSRNN通过回溯可以得到一条路径，那么一个直接的想法就是不通过二维GRU的方式直接获得一条路径，利用这条路径判断这两个句子是否匹配。
+既然MatchSRNN通过回溯可以得到一条路径，那么如果不通过二维GRU的方式，直接获得一条路径，利用这条路径判断这两个句子是否匹配，如图\ref{fig:match_MDP}：
 
 \begin{figure}[!htbp]\centering
 \vspace{1em}
@@ -555,7 +553,7 @@ h_k &= o_k \circ \text{tanh}(c_k)
 		
 \end{enumerate}
 
-图 \ref{fig:value_function_input} 以 $Q$=[The, cat, sat, on, the, mat],$D$=[The, dog, played, balls, on, the, floor], m=3 为例展示了值函数。当前的状态 $s=[2, 2]$ ，我们将 $Q[2:5]=\{\text{sat, on, the}\}, D[2:5]=\{\text{played, balls, on}\}$ 的词向量作为 LSTM 的输入，利用 LSTM 捕捉未来词汇的序列信息，计算每个行为的值。
+图 \ref{fig:value_function_input} 以 $Q$ = [The, cat, sat, on, the, mat],$D$ = [The, dog, played, balls, on, the, floor], m=3 为例展示了值函数。当前的状态 $s=[2, 2]$ ，我们将 $Q[2:5]=[\text{sat, on, the}], D[2:5]=[\text{played, balls, on}]$ 的词向量作为 LSTM 的输入，利用 LSTM 捕捉未来词汇的序列信息，计算每个行为的值。
 
 \begin{figure}[!htbp]\centering
 \vspace{1em}
@@ -621,14 +619,75 @@ LSTM 网络和 \ref{eq:LSTM} 类似, LSTM$_1$  和 LSTM$_2$ 共享参数。
 
 
 \chapter{基于价值迭代的文本匹配算法实现}
-上一章引入了文本匹配的MDP，本章主要介绍文本匹配的MDP的训练与预测过程。我们利用价值迭代算法实现了进行文本匹配 MDP 的训练与预测，将我们的方法称为VIM(value iteration match)。
+上一章介绍了基于强化学习的文本匹配建模，本章主要介绍该模型的训练与预测过程，以及试验情况。我们利用价值迭代算法实现了进行文本匹配的训练与判别，将我们的方法称为基于价值迭代的文本匹配方法(value iteration match，VIM)。
 \section{算法实现}
 
+\subsection{训练过程}
 
+训练时，使用算法\ref{alg:value_iteration}进行优化，模型的参数包括马尔可夫决策过程的参数$Theta_{MDP}$以及判别模型的参数$Theta_c$，在训练时，模型的输入为：$\{Q^{(n)}, D^{(n)}, Y^{(n)}\}_{n=1}^N$，输出参数为$Theta_{MDP}$以及$Theta_c$。
 
+在训练阶段，每次迭代时，利用算法\ref{alg:MDP_TM}为每个样本$Q, D$生成一条路径：
+\begin{equation}\label{eq:mdp_path}
+	\begin{aligned}
+		\{[q_1, d_1], [q_2, d_2], \cdots, [q_t, d_t]\}
+	\end{aligned}
+\end{equation}
 
+并根据生成的路径以及真实结果训练路径判别模型。训练路径匹配模型时的损失函数为交叉熵：
+\begin{equation}\label{eq:classify_model}
+	\begin{aligned}
+		\ell_c(Y, p) = -(Y\log(p) + (1-Y)\log(1-p))
+	\end{aligned}
+\end{equation}
 
-\section{评价指标}
+在路径判别模型收敛后，利用判别模型输出该路径未匹配的概率$p$，并利用 $p$ 计算奖励：
+\begin{equation}\label{eq:reward}
+	\begin{aligned}
+		r = \log(\frac{1}{|p-Y+\Delta|})
+	\end{aligned}
+\end{equation}
+其中$\Delta$表示一个极小值以保证 $|p-Y+\Delta| > 0$。
+
+之后我们利用$r$更新 $]\Theta_{MDP}$。MDP过程的损失函数为：
+\begin{equation}\label{eq:}
+	\begin{aligned}
+		\ell(V(s), r) = \sum_{i=1}^t\left((y - V(r_i))^2\right)
+	\end{aligned}
+\end{equation}
+
+\begin{algorithm}[!htbp]
+	\small
+	\caption{Training Process of VIM}
+	\label{alg:VIM_train}
+	\begin{algorithmic}
+		\STATE \textbf{Input:} Labeled data $\{Q^{(n)}, D^{(n)}, Y^{(n)}\}_{n=1}^N$, learning rate $eta$
+		\STATE \textbf{Output:} $\Theta_{MDP}, \Theta_{c} \leftarrow$ random values in $[-1, 1]$
+		\WHILE {not convergency}
+			\STATE generate path according to Alg~\ref{alg:MDP_TM}
+			\WHILE {not convergency}
+				\STATE $\Theta_{c} = \Theta_{c} - \eta \frac{\delta \ell_c}{\delta \Theta_{c}}$ \COMMENT{$\ell_c$ is defined in Eq~\ref{eq:classify_model}}
+			\ENDWHILE
+			\STATE $\Theta_{MDP} = \Theta_{MDP} - \eta \frac{\delta \ell}{\delta \Theta_{MDP}}$ \COMMENT{$\ell$ is defined in Eq~\ref{eq:MDP_model}}
+			\ENDWHILE
+	\end{algorithmic}	
+\end{algorithm}
+
+\subsection{预测过程}
+推断时，模型接收句子对 $Q, D$ 以及算法 \ref{alg:TM_train} 中得到的值函数 $V$ 作为输入，输出预测结果 $Y$。
+
+在推断时，利用算法\ref{alg:MDP_TM} 为样本$Q, D$生成一条路径
+
+$$\{[q_1, d_1], [q_2, d_2], \cdots, [q_t, d_t]\}$$
+
+并将生成的路径输入到路径判别模型中，利用公式~\ref{eq:TM_classfiy} 计算得到最终的匹配概率。
+
+\section{实验数据及评价指标}
+\subsection{实验数据}
+为了对VIM的有效性进行评估，我们利用 Quora 的问题匹配数据集进行了测试。 Quora 是美国的在线知识问答平台，每天会产生大量的相似问题。该数据集即为 Quora 从其问答平台上收集到并进行了人工标注的匹配问题数据。
+
+该数据集共包含约40万数据集，句子长度从3到100不等，能够较好的对模型的有效性进行评估。由于该数据集的样本量过大，我们从样本中挑选出了长度在 8到10 的约6万个句子对作为数据集，选择其中的 45056 个句子对作为训练集，22528个句子对作为验证集，4441个句子作为测试集对我们的算法进行了测试。
+
+\subsection{评价指标}
 本节介绍用于文本匹配算法的评价指标。在本文中，文本匹配可被看作一个分类问题，判断一个二分类预测模型优劣的评价指标主要有：精确率（Precision），召回率（Recall），F值（F-score），准确率（Accuracy，ACC），受试者工作特征曲线（Receiver Operating Characteristic，ROC），AUC（Area Under Curve of ROC）。
 本文使用的是准确率，F1和AUC这三个指标。
 
@@ -684,7 +743,7 @@ AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由�
 \end{equation}
 
 
-
+\section{实验结果及分析}
 
 
 
