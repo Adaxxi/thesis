@@ -555,14 +555,14 @@ h_k &= o_k \circ \text{tanh}(c_k)
 		
 \end{enumerate}
 
-图 \ref{fig:value_function_input} 以 $Q=\{\text{The, cat, sat, on, the, mat}\},D=\{\text{The, dog, played, balls, on, the, floor}\}, m=3$ 为例展示了值函数。当前的状态 $s=[2, 2]$ ，我们将 $Q[2:5]=\{\text{sat, on, the}\}, D[2:5]=\{\text{played, balls, on}\}$ 的词向量作为 LSTM 的输入，利用 LSTM 捕捉未来词汇的序列信息，计算每个行为的值。
+图 \ref{fig:value_function_input} 以 $Q$=[The, cat, sat, on, the, mat],$D$=[The, dog, played, balls, on, the, floor], m=3 为例展示了值函数。当前的状态 $s=[2, 2]$ ，我们将 $Q[2:5]=\{\text{sat, on, the}\}, D[2:5]=\{\text{played, balls, on}\}$ 的词向量作为 LSTM 的输入，利用 LSTM 捕捉未来词汇的序列信息，计算每个行为的值。
 
 \begin{figure}[!htbp]\centering
 \vspace{1em}
-  \includegraphics[width=0.8\linewidth]{figures/match_value_function}
+  \includegraphics[width=0.6\linewidth]{figures/match_value_function}
   \caption{文本匹配值函数输入} 
   \label{fig:value_function_input}       % Give a unique label
-  \vspace{1em}
+\vspace{1em}
 \end{figure}
 
 
@@ -608,66 +608,80 @@ $$
 p = \sigma(<w, g_c(s)> + b)
 \end{equation}
 
-其中 $w$ 和 $b$ 都是需要学习的参数，
+其中 $w$ 和 $b$ 都是需要学习的参数，$\sigma(x) = \frac{1}{1+e^{-x}}$
+LSTM 网络和 \ref{eq:LSTM} 类似, LSTM$_1$  和 LSTM$_2$ 共享参数。
+\begin{figure}[!htbp]
+    \centering
+    \vspace{1em}
+    \includegraphics[width=0.40\textwidth]{path_classify}
+    \caption{匹配路径判定}
+    \label{fig:path_classify}
+    \vspace{1em}
+\end{figure}
+
 
 \chapter{基于价值迭代的文本匹配算法实现}
+上一章引入了文本匹配的MDP，本章主要介绍文本匹配的MDP的训练与预测过程。我们利用价值迭代算法实现了进行文本匹配 MDP 的训练与预测，将我们的方法称为VIM(value iteration match)。
+\section{算法实现}
 
 
-%\section{评价指标}
-%本节介绍用于文本匹配算法的评价指标。在本文中，文本匹配可被看作一个分类问题，判断一个二分类预测模型优劣的评价指标主要有：精确率（Precision），召回率（Recall），F值（F-score），准确率（Accuracy，ACC），受试者工作特征曲线（Receiver Operating Characteristic，ROC），AUC（Area Under Curve of ROC）。
-%本文使用的是准确率，F1和AUC这三个指标。
-%
-%\begin{figure}[!htbp]
-%\vspace{1em}
-%\centering
-%  \includegraphics[width=0.9\linewidth]{figures/matrix}
-%  \caption{混淆矩阵}
-%  \label{fig:Con_matrix}       % Give a unique label
-%\vspace{1em}
-%\end{figure}
-%
-%图\ref{fig:Con_matrix}是混淆矩阵（Confusion Matrix）。本节出现的所有指标都是以该矩阵为依据。
-%
-%准确率$\text{ACC}$是计算样本被正确预测的次数占总样本的比例，如式~\eqref{acc_eq}~。准确率越高，算法在该指标上表现越好，当准确率为1时，该评价指标达到最优值。
-%\begin{equation}
-%\label{acc_eq}
-%\begin{aligned}
-%\text{ACC}=\frac{\text{TP}+\text{TN}}{\text{TP}+\text{FP}+\text{TN}+\text{FN}}
-%\end{aligned}
-%\end{equation}
-%
-%精确率是被模型预测为正的样本中，实际为正样本的比例，如式~\eqref{precision_eq}~，召回率是实际为正的样本中，正确预测为正样本的比例，如式~\eqref{recall_eq}~。
-%\begin{equation}
-%\label{precision_eq}
-%\begin{aligned}
-%\text{P}=\frac{\text{TP}}{\text{TP}+\text{FP}}
-%\end{aligned}
-%\end{equation}
-%\begin{equation}
-%\label{recall_eq}
-%\begin{aligned}
-%\text{R}=\frac{\text{TP}}{\text{TP}+\text{FP}}
-%\end{aligned}
-%\end{equation}
-%
-%$\text{F}_1$是精确率和召回率的调和平均数，相当于精确率和召回率的综合评价指标，如式~\eqref{f1_eq}~。$\text{F}_1$越大，算法在该指标上表现越好，当$\text{F}_1$为1时，该评价指标达到最优。
-%\begin{equation}
-%\label{f1_eq}
-%\begin{aligned}
-%\text{F}_1 &= \frac{2}{\frac{1}{P}+\frac{1}{R}} \\
-%\text{F}_1 &= \frac{2*P*R}{P+R}
-%\end{aligned}
-%\end{equation}
-%
-%AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由两个变量真正样本率TPR（True Positive Rate）和假正样本率FPR(False Positive Rate)绘制，其中TPR和FPR如式~\eqref{tpr_fpr}~，分别反映了正样本和负样本的分类准确率，AUC越大，算法在该指标上表现越好，当AUC为1时，该评价指标达到最优。
-%\begin{equation}
-%\label{tpr_fpr}
-%\begin{aligned}
-%\text{TPR} &= \frac{TP}{TP+FN} \\
-%\text{FPR} &= \frac{FP}{FP+TN}
-%\end{aligned}
-%\end{equation}
-%
+
+
+
+\section{评价指标}
+本节介绍用于文本匹配算法的评价指标。在本文中，文本匹配可被看作一个分类问题，判断一个二分类预测模型优劣的评价指标主要有：精确率（Precision），召回率（Recall），F值（F-score），准确率（Accuracy，ACC），受试者工作特征曲线（Receiver Operating Characteristic，ROC），AUC（Area Under Curve of ROC）。
+本文使用的是准确率，F1和AUC这三个指标。
+
+\begin{figure}[!htbp]
+\vspace{1em}
+\centering
+  \includegraphics[width=0.9\linewidth]{figures/matrix}
+  \caption{混淆矩阵}
+  \label{fig:Con_matrix}       % Give a unique label
+\vspace{1em}
+\end{figure}
+
+图\ref{fig:Con_matrix}是混淆矩阵（Confusion Matrix）。本节出现的所有指标都是以该矩阵为依据。
+
+准确率$\text{ACC}$是计算样本被正确预测的次数占总样本的比例，如式~\eqref{acc_eq}~。准确率越高，算法在该指标上表现越好，当准确率为1时，该评价指标达到最优值。
+\begin{equation}
+\label{acc_eq}
+\begin{aligned}
+\text{ACC}=\frac{\text{TP}+\text{TN}}{\text{TP}+\text{FP}+\text{TN}+\text{FN}}
+\end{aligned}
+\end{equation}
+
+精确率是被模型预测为正的样本中，实际为正样本的比例，如式~\eqref{precision_eq}~，召回率是实际为正的样本中，正确预测为正样本的比例，如式~\eqref{recall_eq}~。
+\begin{equation}
+\label{precision_eq}
+\begin{aligned}
+\text{P}=\frac{\text{TP}}{\text{TP}+\text{FP}}
+\end{aligned}
+\end{equation}
+\begin{equation}
+\label{recall_eq}
+\begin{aligned}
+\text{R}=\frac{\text{TP}}{\text{TP}+\text{FP}}
+\end{aligned}
+\end{equation}
+
+$\text{F}_1$是精确率和召回率的调和平均数，相当于精确率和召回率的综合评价指标，如式~\eqref{f1_eq}~。$\text{F}_1$越大，算法在该指标上表现越好，当$\text{F}_1$为1时，该评价指标达到最优。
+\begin{equation}
+\label{f1_eq}
+\begin{aligned}
+\text{F}_1 &= \frac{2}{\frac{1}{P}+\frac{1}{R}} \\
+\text{F}_1 &= \frac{2*P*R}{P+R}
+\end{aligned}
+\end{equation}
+
+AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由两个变量真正样本率TPR（True Positive Rate）和假正样本率FPR(False Positive Rate)绘制，其中TPR和FPR如式~\eqref{tpr_fpr}~，分别反映了正样本和负样本的分类准确率，AUC越大，算法在该指标上表现越好，当AUC为1时，该评价指标达到最优。
+\begin{equation}
+\label{tpr_fpr}
+\begin{aligned}
+\text{TPR} &= \frac{TP}{TP+FN} \\
+\text{FPR} &= \frac{FP}{FP+TN}
+\end{aligned}
+\end{equation}
 
 
 
