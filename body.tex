@@ -94,7 +94,7 @@
 \begin{figure}[htbp!]
 \vspace{1em}
 \centering
-\includegraphics[width=1.0\textwidth]{figures/DSSM.png}
+\includegraphics[width=1.0\linewidth]{figures/DSSM.png}
 \caption{深度语义结构模型}\label{fig:DSSM}
 \vspace{1em}
 \end{figure}
@@ -276,8 +276,8 @@ AlphaGo Zero的成功证明了在没有任何先验经验的情况下，深度�
 
 目前深度学习和强化学习的结合使得强化学习的表达能力大幅度上升，为学习传统文本匹配中复杂的规则和模式带来了可能。由于目前计算机理解人类语义十分困难，因此基于模式匹配的方式在短文本匹配场景中仍然拥有巨大的价值。本文会结合强化学习和文本匹配的特点，设计使用与文本匹配的强化学习算法。
 
-\chapter{文本匹配问题的马尔可夫决策过程建模}
-文本匹配的应用本章主要介绍了文本匹配问题的数学描述，强化学习的主要技术——马尔可夫决策过程以及面向文本匹配的算法设计。
+\chapter{基于强化学习的文本匹配算法建模}
+文本匹配的应用本章主要介绍了文本匹配问题的数学描述，强化学习的主要算法——马尔可夫决策过程以及面向文本匹配的算法设计。
 \section{文本匹配描述}
 为了更好地解决文本匹配问题，本节会利用数学符号形式化地定义文本匹配这个任务。
 
@@ -288,7 +288,7 @@ AlphaGo Zero的成功证明了在没有任何先验经验的情况下，深度�
 \section{马尔可夫决策过程}
 强化学习研究的是如何根据环境的反馈，作出行动，从而最大化总收益。详细过程如下：在某一时刻 $t$ ，主体会处于状态 $s_t$，并从环境中得到观测 $o_t$，根据观测和行动利用策略 $\pi_\theta(a_t|o_t)$ 或者 $\pi_\theta(a_t|s_t)$作出行动 $a_t$，环境根据主体状态 $s_t$ 以及行动 $a_t$ 通过转移概率分布函数 $p(s_{t+1}| s_t, a_t)$ 得到状态 $s_{t+1}$，通过奖励函数 $r(s, a)$ 得到奖励 $r_t$，周而复始。而当环境是完全可观测的时候，它通常被形式化的描述为为马尔可夫决策过程（Markov Decision Process，MDP）几乎所有。强化学习中马尔可夫决策过程可以解决大部分问题\cite{Sutton1998ReinFORcementL}，本小节会简要介绍马尔可夫决策过程及相关概念。
 
-\subsection{马尔可夫相关概念}
+\subsection{马尔科夫相关概念}
 
 在描述马尔可夫决策过程前，首先需要定义马尔可夫性质，一个状态有马尔可夫性质，当且仅当它满足式~\eqref{Markov}~，即在给定现在状态时，它与过去状态（即该过程的历史路径）是无关的。当前的状态已经包含了历史所有相关信息的状态，只要已知当前状态，可以丢弃所有历史信息，因为该状态已经足够预测未来。
 \begin{equation}
@@ -469,9 +469,11 @@ v_{k+1}(s) &= \mathbb{E}[R_{t+1}+\gamma v_k(S_{t+1})|S_t=s]\\
 探索和利用各有优势，将二者结合的算法被称为$\epsilon$-贪心算法。我们在每次选择行动的时候，都以$\epsilon$的概率进行探索，以$1-\epsilon$的概率进行利用。可以通过 $\epsilon$ 的调整在算法的不同阶段达到不同的效果。
 
 
-\section{面向文本匹配的马尔可夫决策过程建模}
+\section{基于强化学习的文本匹配建模}
 \label{sec:TM_MDP}
 本节将强化学习建模为一个强化学习过程。
+
+\subsection{基于马尔可夫决策过程的匹配路径建模}
 
 在\ref{sec:text_matching} 节，中我们介绍了MatchSRNN\cite{Wan2016MatchSRNNMT} 算法。MatchSRNN 使用匹配矩阵中提取句子间的交互信息，利用二维 GRU 提取单个句子和句子之间的序列信息。 在二维 GRU计算完成后，通过二维 GRU 的状态，我们可以回溯出一条路径。
 图\ref{fig:LD_dis}表示了对 $Q$=How to get rid of memory stick error of my
@@ -502,15 +504,15 @@ stick but what is the error message you are receiving. 得到的匹配矩阵进�
 
 \begin{enumerate}
 	\item 状态$\mathcal{S}$：将在 $t$ 时刻的状态 $s_t$ 定义为从当前位置开始向前看的 $m$ 个单词：
-	\begin{equation}\label{MDP_state}
+	\begin{equation}\label{MDP_STATE}
 	\begin{aligned}
 		s_t &= \{[\mathbf{u}_{q_t}, \mathbf{v}_{d_t}], [\mathbf{u}_{1+q_t},\mathbf{v}_{1+d_t}] \cdots, [\mathbf{u}_{m+q_t}, \mathbf{v}_{m+d_t}]\}
 	\end{aligned}
 	\end{equation}
-	式\eqref{MDP_state}中，$q_t$ 和$d_t$表示当前位置。
+	式\eqref{MDP_STATE}中，$q_t$ 和$d_t$表示当前位置。
 	\item 动作$\mathcal{A}$：在每个时间$t$：向包括右、下、右下三个方向中的某个移动一步。
 	\item 状态转移函数$\mathcal{T}(S,\mathcal{A})$：状态转移函数$\mathcal{T}:S\times \mathcal{A}\rightarrow S$ 被定义为：
-	\begin{equation}\label{MDP_state}
+	\begin{equation}\label{MDP_STATE}
 	\begin{aligned}
 		(q_{t+1}, d_{t+1}) =
 \begin{cases}
@@ -520,15 +522,93 @@ stick but what is the error message you are receiving. 得到的匹配矩阵进�
 \end{cases} \\
 	\end{aligned}
 	\end{equation}
-	\begin{equation}\label{MDP_state}
+	\begin{equation}\label{MDP_STATE}
 	\begin{aligned}
 		s_{t+1} = \mathcal{T}(s_t,a_t)=[\mathbf{u}_{q_{t+1}},\mathbf{v}_{d_{t+1}}],[\mathbf{u}_{1+q_{t+1}},\mathbf{v}_{1+d_{t+1}}],\cdots,[\mathbf{u}_{m+q_{t+1}},\mathbf{v}_{m+d_{t+1}}]
 	\end{aligned}
 	\end{equation}
 	\item 在每个时间$t$：系统根据当前状态选择一个行动（移动方向），并根据方向移动到下一个位置，状态随之转移：根据当前的位置($q_{t+1},d_{t+1}$)更新未来状态，完成转移后，再根据当前状态继续移动。
-	\item 值函数$V$：值函数$V: S\rightarrow \mathbb{R}$是对当前模型是否能够得到正确结果的预测。值函数需要不断更新以更加准确的得到预测结果。本节所提出的值函数的目标是预测模型是否能够预测正确
-
+	\item 值函数$V$：值函数$V: S\rightarrow \mathbb{R}$是对当前模型是否能够得到正确结果的预测。值函数需要不断更新以更加准确的得到预测结果。本节所提出的值函数的目标是预测模型是否能够预测正确，即$mathbf{1}_{t==y}$，其中 $t$ 为预测标签， $y$ 为实际标签。值函数以两个句子当前位置的前 $m$ 个单词作为输入，确定当前橘子是否可以正确判别。
+	
+		我们利用一个 LSTM 网络处理输入的序列，通过对 LSTM 网络输出的加权和进行线性变换，得到值函数：
+	\begin{equation}\label{value_func}
+	\begin{aligned}
+		V(s) = \sigma(<w, g(s)>, b_v)
+	\end{aligned}
+	\end{equation}
+		其中，$g(s)$ 是LSTM的输出：
+	\begin{equation}\label{g(s)}
+	\begin{aligned}
+		g(s) = LSTM(Q[q_t: m+q_t], D[d_t: m+d_t])
+	\end{aligned}
+	\end{equation}
+		LSTM网络接受两个长度为 $m$ 的单词序列，计算得到隐状态，计算过程如式：
+	\begin{equation}\label{mdp_LSTM}
+	\begin{aligned}
+		f_k &= \sigma(W_f[Q_{k+q_{t}}, D_{k+d_{t}}] + U_fh_{k-1} + b_f) \\
+i_k &= \sigma(W_i[Q_{k+q_{t}}, D_{k+d_{t}}] + U_ih_{k-1} + b_i) \\
+o_k &= \sigma(W_o[Q_{k+q_{t}}, D_{k+d_{t}}] + U_oh_{k-1} + b_o) \\
+c_k &= f_k \circ c_{K-1} + i_k \circ (W_c[Q_{k+q_{t}}, D_{k+d_{t}}] + U_ch_{k-1}+b_c) \\
+h_k &= o_k \circ \text{tanh}(c_k) 
+	\end{aligned}
+	\end{equation}
+		
 \end{enumerate}
+
+图 \ref{fig:value_function_input} 以 $Q=\{\text{The, cat, sat, on, the, mat}\},D=\{\text{The, dog, played, balls, on, the, floor}\}, m=3$ 为例展示了值函数。当前的状态 $s=[2, 2]$ ，我们将 $Q[2:5]=\{\text{sat, on, the}\}, D[2:5]=\{\text{played, balls, on}\}$ 的词向量作为 LSTM 的输入，利用 LSTM 捕捉未来词汇的序列信息，计算每个行为的值。
+
+\begin{figure}[!htbp]\centering
+\vspace{1em}
+  \includegraphics[width=0.8\linewidth]{figures/match_value_function}
+  \caption{文本匹配值函数输入} 
+  \label{fig:value_function_input}       % Give a unique label
+  \vspace{1em}
+\end{figure}
+
+
+
+获得匹配路径的算法可以被表示为：
+\begin{algorithm}[!htbp]
+    \small
+    \caption{MDP of Text Match}\label{alg:MDP_TM}
+    \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+    \renewcommand{\algorithmicensure}{\textbf{Output:}}
+    \begin{algorithmic}
+        \STATE \textbf{Input:} Labeled data $D=\{ (\mathbf{Q}, \mathbf{D}, \mathbf{Y}) \}$
+        \STATE \textbf{Output:} Path
+        \STATE \text{Initialize} Path $\leftarrow [0, 0]$
+        \STATE {set $q_1=0, d_2=0$}
+        \WHILE {$q_t < \text{len}(\mathbf{s}_1)$ and $d_t < \text{len}(\mathbf{s}_2)$}
+        \STATE $a_t = \arg\max_a v(Q [q_t:m+q_t], D [d_t:m+d_t]， a)$
+        \STATE update status according to Eq \ref{eq:status_transfer}
+        \STATE Path $\leftarrow$ Path $\oplus [q_t, d_t]$ \COMMENT{$\oplus$ means appends to end}
+        \ENDWHILE
+    \end{algorithmic}
+\end{algorithm}
+
+在计算路径时，算法从初始状态 $s_1 = [Q[1:m], D[1:m]]$ 出发，每次将当前位置的前 $m$ 个词作为输入，得到每个行动的值，选择值最大的行动作为当前的行动，并根据当前的行为移动到下一个位置，直到到达矩阵的右下角。一直选择值最大的行动可能会导致算法陷入局部最优解，因此可以采用 $\epsilon$-贪心的方法控制探索和利用的程度。
+
+\subsection{匹配路径的判别模型}
+\label{sec:path_classify}
+
+在计算匹配路径之后，我们需要根据路径判断两个句子是否匹配。判别算法以原句子 $Q, D$ 以及对应的路径映射 $m_1 = [q_1, q_2, \cdots, q_t], m_2 = [d_1, d_2, \cdots, d_t]$ 作为输入，判断两个句子是否匹配。
+
+我们利用3个LSTM网络作为判别模型，其中 LSTM$_1$ 和 LSTM$_2$ 将 $S_1$ 和 $S_2$ 映射为2个矩阵，LSTM$_c$ 将这两个矩阵映射为一个一维向量 $g_c(s)$:
+$$
+\begin{aligned}
+f(Q) &= \text{LSTM}_1(Q) \\
+h(D) &= \text{LSTM}_2(D) \\
+g_c(s) &= \text{LSTM}_c([{f(Q)}_{q_1}, {h(D)}_{d_1}], [{f(Q)}_{q_2}, {h(D)}_{d_2}], \cdots, [{f(Q)}_{q_t}, {h(D)}_{d_t}])
+\end{aligned}
+$$
+
+通过对 $g_c(s)$ 的加权和进行归一化得到最终的匹配概率
+\begin{equation}
+\label{eq:TM_classfiy}
+p = \sigma(<w, g_c(s)> + b)
+\end{equation}
+
+其中 $w$ 和 $b$ 都是需要学习的参数，
 
 \chapter{基于价值迭代的文本匹配算法实现}
 
