@@ -353,20 +353,20 @@ p_\theta(\tau) = p(s_1)\prod_{t=1}^T \pi_\theta(a_t|s_t)p(s_{t+1}|s_t,a_t)
 \end{aligned}
 \end{equation}
 
-马尔可夫决策过程能够解决大部分强化学习问题，而一个完整的强化学习的训练过程，如图\ref{fig:RL_process}一般包含 3 个部分：
-
-1. 生成样本。在模拟器中运行我们当前的策略并收集轨迹(trajectory)样本。轨迹的收集即主体和环境的交互过程：在 $t$ 时刻，我们从环境得到观测信息 $o_t$，在此观测信息下根据策略 $\pi_\theta(a_t|o_t)$ 得到当前的行动 $a_t$，根据系统的转移概率 $p(s_{t+1}|s_t, a_t)$ 得到下一个状态 $s_{t+1}$。在做出当前的行动之后，我们会得到收益 $r(s_t,a_t)$, 简记为 $r_t$ 。我们的目标就是最大化得到的总收益。
-
-2. 收益估计。不同的算法在这一步的表现不尽相同。对于策略学习来说，就是策略评估；对于基于模型的增强学习算法，就是模型拟合。
-
-3. 改进策略。根据上一步得到的结果改进策略，再执行第一步，循环往复。
-\begin{figure}[!htbp]\centering
-\vspace{1em}
-  \includegraphics[width=0.6\linewidth]{figures/RL_process.jpg}
-  \caption{强化学习算法一般步骤}
-  \label{fig:RL_process}       % Give a unique label
-  \vspace{1em}
-\end{figure}
+%马尔可夫决策过程能够解决大部分强化学习问题，而一个完整的强化学习的训练过程，如图\ref{fig:RL_process}一般包含 3 个部分：
+%
+%1. 生成样本。在模拟器中运行我们当前的策略并收集轨迹(trajectory)样本。轨迹的收集即主体和环境的交互过程：在 $t$ 时刻，我们从环境得到观测信息 $o_t$，在此观测信息下根据策略 $\pi_\theta(a_t|o_t)$ 得到当前的行动 $a_t$，根据系统的转移概率 $p(s_{t+1}|s_t, a_t)$ 得到下一个状态 $s_{t+1}$。在做出当前的行动之后，我们会得到收益 $r(s_t,a_t)$, 简记为 $r_t$ 。我们的目标就是最大化得到的总收益。
+%
+%2. 收益估计。不同的算法在这一步的表现不尽相同。对于策略学习来说，就是策略评估；对于基于模型的增强学习算法，就是模型拟合。
+%
+%3. 改进策略。根据上一步得到的结果改进策略，再执行第一步，循环往复。
+%\begin{figure}[!htbp]\centering
+%\vspace{1em}
+%  \includegraphics[width=0.6\linewidth]{figures/RL_process.jpg}
+%  \caption{强化学习算法一般步骤}
+%  \label{fig:RL_process}       % Give a unique label
+%  \vspace{1em}
+%\end{figure}
 
 \subsection{马尔可夫决策过程求解}
 求解马尔可夫决策过程，除上述五元组外，还需要定义一些概念：
@@ -666,7 +666,7 @@ LSTM 网络和 \ref{eq:LSTM} 类似, LSTM$_1$  和 LSTM$_2$ 共享参数。
 其中$\Delta$表示一个极小值以保证 $|p-Y+\Delta| > 0$。
 
 之后我们利用$r$更新 $\Theta_{MDP}$。MDP过程的损失函数为：
-\begin{equation}\label{eq:}
+\begin{equation}\label{eq:MDP_model}
 	\begin{aligned}
 		\ell(V(s), r) = \sum_{i=1}^t\left((y - V(r_i))^2\right)
 	\end{aligned}
@@ -675,7 +675,7 @@ LSTM 网络和 \ref{eq:LSTM} 类似, LSTM$_1$  和 LSTM$_2$ 共享参数。
 
 
 \subsection{预测过程}
-推断时，模型接收句子对 $Q, D$ 以及算法 \ref{alg:TM_train} 中得到的值函数 $V$ 作为输入，输出预测结果 $Y$。
+推断时，模型接收句子对 $Q, D$ 以及算法 \ref{alg:VIM_train} 中得到的值函数 $V$ 作为输入，输出预测结果 $Y$。
 
 在推断时，利用算法\ref{alg:MDP_TM} 为样本$Q, D$生成一条路径：
 \begin{equation}\label{eq:}
@@ -728,21 +728,19 @@ LSTM 网络和 \ref{eq:LSTM} 类似, LSTM$_1$  和 LSTM$_2$ 共享参数。
 \end{aligned}
 \end{equation}
 
-精确率是被模型预测为正的样本中，实际为正样本的比例，如式~\eqref{precision_eq}~，召回率是实际为正的样本中，正确预测为正样本的比例，如式~\eqref{recall_eq}~。
-\begin{equation}
-\label{precision_eq}
-\begin{aligned}
-\text{P}=\frac{\text{TP}}{\text{TP}+\text{FP}}
-\end{aligned}
-\end{equation}
-\begin{equation}
-\label{recall_eq}
-\begin{aligned}
-\text{R}=\frac{\text{TP}}{\text{TP}+\text{FP}}
-\end{aligned}
-\end{equation}
-
-$\text{F}_1$是精确率和召回率的调和平均数，相当于精确率和召回率的综合评价指标，如式~\eqref{f1_eq}~。$\text{F}_1$越大，算法在该指标上表现越好，当$\text{F}_1$为1时，该评价指标达到最优。
+精确率是被模型预测为正的样本中，实际为正样本的比例，，召回率是实际为正的样本中，正确预测为正样本的比例。$\text{F}_1$是精确率和召回率的调和平均数，相当于精确率和召回率的综合评价指标，如式~\eqref{f1_eq}~。$\text{F}_1$越大，算法在该指标上表现越好，当$\text{F}_1$为1时，该评价指标达到最优。
+%\begin{equation}
+%\label{precision_eq}
+%\begin{aligned}
+%\text{P}=\frac{\text{TP}}{\text{TP}+\text{FP}}
+%\end{aligned}
+%\end{equation}
+%\begin{equation}
+%\label{recall_eq}
+%\begin{aligned}
+%\text{R}=\frac{\text{TP}}{\text{TP}+\text{FP}}
+%\end{aligned}
+%\end{equation}
 \begin{equation}
 \label{f1_eq}
 \begin{aligned}
@@ -750,7 +748,7 @@ $\text{F}_1$是精确率和召回率的调和平均数，相当于精确率和�
 \end{aligned}
 \end{equation}
 
-AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由两个变量真正样本率TPR（True Positive Rate）和假正样本率FPR(False Positive Rate)绘制，其中TPR和FPR如式~\eqref{tpr_fpr}~，分别反映了正样本和负样本的分类准确率，AUC越大，算法在该指标上表现越好，当AUC为1时，该评价指标达到最优。
+AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由两个变量：真正样本率TPR（True Positive Rate）和假正样本率FPR(False Positive Rate)绘制，其中TPR和FPR如式~\eqref{tpr_fpr}~，分别反映了正样本和负样本的分类准确率，AUC越大，算法在该指标上表现越好，当AUC为1时，该评价指标达到最优。
 \begin{equation}
 \label{tpr_fpr}
 \begin{aligned}
@@ -763,8 +761,6 @@ AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由�
 \section{实验结果及分析}
 \label{sec:lab_value}
 对于文本匹配问题，目前已经有多种算法可以很好地解决该问题。本文选取了其中两个经典的文本匹配算法 MatchPyramid\cite{Pang2016TextMA} 以及 MatchSRNN\cite{Wan2016MatchSRNNMT} 来与本文提出的算法进行比较。
-
-在 Quora 数据集上。本文进行了算法的五折交叉验证。即将原始数据集合分割成五份，每份大小相同。每一折实验选择其中的四份数据作为训练集，一份数据作为验证集。上述过程重复五次，即每份数据都被用做验证集。每一折实验都选取验证集上评价准则最高的参数进行测试，将测试结果取平均值作为最后的评估结果。
 
 \begin{table}[htbp]
 \caption{文本匹配算法在 Quora 数据集上的测试结果}\label{tab:MDP_test}
@@ -783,25 +779,22 @@ AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由�
 \vspace{\baselineskip}
 \end{table}
 
-可以发现 VIM 在 ACC 和 AUC 上均显著优于 MatchPyramid 和 MatchSRNN， 在 F1 上三者相差并不大。
+在 Quora 数据集上，本文进行了算法的五折交叉验证。即将原始数据集合分割成五份，每份大小相同。每一折实验选择其中的四份数据作为训练集，一份数据作为验证集。上述过程重复五次，即每份数据都被用做验证集。每一折实验都选取验证集上评价准则最高的参数进行测试，将测试结果取平均值作为最后的评估结果。从表\ref{tab:MDP_test}中可以发现 VIM 在 ACC 和 AUC 上均显著优于 MatchPyramid 和 MatchSRNN， 在 F1 上三者相差并不大。
 
 \begin{figure}[!htbp]
 \vspace{1em}
 \centering
-  \includegraphics[width=0.8\linewidth]{figures/value_iter_line}
+  \includegraphics[width=0.7\linewidth]{figures/value_iter_line}
   \caption{文本匹配算法的准确率变化曲线}
   \label{fig:value_iter_line}       % Give a unique label
 \vspace{1em}
 \end{figure}
 
+
 根据在 QuoraQP 上的测试结果来看，使用价值迭代的方式训练马尔科夫决策过程的收敛速度很快，图\ref{fig:value_iter_line}为我们的算法在上面试验中某一折数据的准确率变化曲线，蓝色曲线为测试集的准确率，黄色曲线为验证集的准确率。可以发现我们的算法收敛速度很快，在第50轮左右就可以做到收敛。
 
 
-
 为了测试向前看的单词个数$m$对于算法性能的影响，我们对向前看 2，3，4，5 个单词分别进行了实验。实验结果如表\ref{tab:MDP_test}。
-
-可以发现 $m=3$ 时算法的表现最优。这是因为一般情况下来说，语言的组合结构问题构成的词语个数都是有限的，一般都在3，4个左右。在 $m=2$ 时，无法覆盖大部分的次序颠倒的场景；在 $m$大于3时，算法的各项指标都开始逐渐下滑。这可能是因为在 $m$ 过大后，截取到的句子长度远大于次序颠倒部分的长度，使得神经网络捕捉到的信息中更多的包含了序列信息，次序颠倒信息的比重下降。
-
 \begin{table}[htbp]
 \caption{文本匹配算法在 Quora 数据集上的测试结果}\label{tab:MDP_test}
 \vspace{0.5em}\centering\wuhao
@@ -820,6 +813,7 @@ AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由�
 \vspace{\baselineskip}
 \end{table}
 
+可以发现 $m=3$ 时算法的表现最优。这是因为一般情况下来说，语言的组合结构问题构成的词语个数都是有限的，一般都在3，4个左右。在 $m=2$ 时，无法覆盖大部分的次序颠倒的场景；在 $m$大于3时，算法的各项指标都开始逐渐下滑。这可能是因为在 $m$ 过大后，截取到的句子长度远大于次序颠倒部分的长度，使得神经网络捕捉到的信息中更多的包含了序列信息，次序颠倒信息的比重下降。
 \begin{figure}[!htbp]
 \vspace{1em}
 \centering
@@ -833,7 +827,7 @@ AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由�
 
 但是由于值迭代基于贪心的策略导致算法很容易陷入过拟合，为了测试VIM算法的小数据集上的效果，我们在Quora数据集上选取了10240个句子对进行测试。测试方法同样采用五折交叉验证：
 \begin{table}[htbp]
-\caption{文本匹配算法在 Quora 数据集上的测试结果}\label{tab:MDP_test}
+\caption{文本匹配算法在 Quora 数据集上的测试结果}\label{tab:MDP_small_test}
 \vspace{0.5em}\centering\wuhao
 \begin{tabular}{ccccc}
 \toprule[1.5pt]
@@ -860,41 +854,8 @@ AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由�
 
 \chapter{基于蒙特卡洛树搜索的文本匹配建模及实现}
 
-很多和计算机专业背景相关的同学都会使用到代码环境，使用~\verb|\verb|~指令或者是~\verb|verbatim|~环境固然是一种选择，但是比不上专门的~lstlisting~环境这么专业。
 
-\begin{lstlisting}
-int main(int argc, char ** argv) {
-    printf("Hello world!\n");
-    return 0;
-}
-\end{lstlisting}
 
-\section{普通表格的绘制方法}
-
-表格应具有三线表格式，其标准格式如表 \ref{tab:table1} 所示。
-\begin{table}[htbp]
-\caption{符合本科生毕业论文绘图规范的表格}\label{tab:table1}
-\vspace{0.5em}\centering\wuhao
-\begin{tabular}{ccccc}
-\toprule[1.5pt]
-$D$(in) & $P_u$(lbs) & $u_u$(in) & $\beta$ & $G_f$(psi.in)\\
-\midrule[1pt]
- 5 & 269.8 & 0.000674 & 1.79 & 0.04089\\
-10 & 421.0 & 0.001035 & 3.59 & 0.04089\\
-20 & 640.2 & 0.001565 & 7.18 & 0.04089\\
- 5 & 269.8 & 0.000674 & 1.79 & 0.04089\\
-10 & 421.0 & 0.001035 & 3.59 & 0.04089\\
-20 & 640.2 & 0.001565 & 7.18 & 0.04089\\
- 5 & 269.8 & 0.000674 & 1.79 & 0.04089\\
-10 & 421.0 & 0.001035 & 3.59 & 0.04089\\
-20 & 640.2 & 0.001565 & 7.18 & 0.04089\\
- 5 & 269.8 & 0.000674 & 1.79 & 0.04089\\
-10 & 421.0 & 0.001035 & 3.59 & 0.04089\\
-20 & 640.2 & 0.001565 & 7.18 & 0.04089\\
-\bottomrule[1.5pt]
-\end{tabular}
-\vspace{\baselineskip}
-\end{table}
 
 %%%%%%% 结论 %%%%%%%
 
