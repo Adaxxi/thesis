@@ -967,7 +967,7 @@ $f_\theta$的损失函数为：
 \vspace{1em}
 \centering
   \includegraphics[width=0.8\linewidth]{figures/grid}
-  \caption{MM}
+  \caption{MM-Match 算法结构}
   \label{fig:MCTS_sum}       % Give a unique label
 \vspace{1em}
 \end{figure}
@@ -1006,16 +1006,107 @@ V(s) = \sigma (<\mathbf{w}, \mathbf{g}_v(s)> + \mathbf{b}_v)
 \end{equation}
 式中 $\mathbf{w}, \mathbf{b}_v$ 是需要学习的参数，$
 \sigma(x) = \frac{1}{1+e^{-x}}$ 是 sigmoid 函数以输出一个 0 $\sim$ 1 之间的概率，$\mathbf{g}_v(s)$ 是对将 LSTM$_Q$ 以及 LSTM$_D$ 的最后一层隐向量连接得到的：
-
 \begin{equation}
 \mathbf{g}_v(s) = [\mathrm{LSTM}_Q(\mathbf{Q}_t)^T, \mathrm{LSTM}_D(\mathbf{D}_{t})^T]^T
 \end{equation}
 
 LSTM 网络的定义和公式~\ref{eq:LSTM} 一致，LSTM$_Q$ 和 LSTM$_D$ 共享参数。
 
-	\item 	
-
+	\item 策略函数 $\mathbf{\pi}$：$\mathbf{\pi}(s)$将环境状态作为输入，输出每个行动的概率。策略函数将 $\mathbf{g}_v(s)$ ，$F_t$作为输入，使用一个LSTM将	$F_t$ 映射为一个一维向量，并将其和$\mathbf{g}_v(s)$连接，将连接后的向量利用softmax函数进行归一化得到每个行动的概率分布：
+\begin{equation}
+\label{eq:MCTS_policy}
+\begin{aligned}
+\pi(a|s) &= \frac{\exp\left\{\Phi(a)^T \mathbf{U}_\pi ~\mathbf{g}_\pi(s)\right\}}{\sum_{a'\in\mathcal{A}(s)} \exp\left\{\Phi(a')^T \mathbf{U}_\pi ~\mathbf{g}_\pi(s)\right\}} \\
+\mathbf{g}_\pi(s) &= [\mathbf{g}_v(s) , \mathrm{LSTM}_F(\mathbf{F}_{t})^T]^T
+\end{aligned}
+\end{equation}
+	
 \end{enumerate}
+
+\subsection{匹配路径的判别}
+在 \ref{sec:path_classify} 中，我们提出了一种针对于路径的判别模型判断路径是否匹配。但是由于该方法在每次运行时的计算图都不尽相同，因此效率很低。本节对该方法进行了改进以提高其训练和推断速度。
+
+判别模型将 $\mathbf{Q}_t$ 和 $\mathbf{D}_t$ 作为输入，并使用两个 LSTM 将其映射为2个矩阵，最后使用一个 LSTM 接受两个矩阵作为输入，输出一个一维向量：
+\begin{equation}
+\label{eq:MCTS_policy}
+\begin{aligned}
+\mathbf{g}_q &= \mathrm{LSTM}_Q(Q_t)\\
+\mathbf{g}_d &= \mathrm{LSTM}_D(D_t)\\
+\mathbf{g}_c^{\text{in}} &= [[\mathbf{g}_{q, 1}, \mathbf{g}_{d, 1}], [\mathbf{g}_{q, 2}, \mathbf{g}_{d, 2}], \cdots, [\mathbf{g}_{q, t}, \mathbf{g}_{d, t}]]\\
+\mathbf{g}_c^{\text{out}} &= \mathrm{LSTM}_C({g}_c^{\text{in}})
+\end{aligned}
+\end{equation}
+
+LSTM$_Q$和LSTM$_D$ 共享参数。最后输出概率会通过 sigmoid 函数变换概率输出：
+\begin{equation}
+\label{eq:classification_model}
+p_m = \frac{1}{1+e^{-{\mathbf{g}_c^{\text{out}}}}}
+\end{equation}
+
+\begin{figure}[!htbp]
+\vspace{1em}
+\centering
+  \includegraphics[width=0.4\linewidth]{figures/MCTS_path}
+  \caption{路径判别函数}
+  \label{fig:MCTS_path}       % Give a unique label
+\vspace{1em}
+\end{figure}
+
+\subsection{蒙特卡罗树搜索的训练和推断}
+\label{sec:MCTS_train}
+在\ref{sec:lab_value} 节，本文通过在大数据和小数据集上的训练结果发现单纯将策略函数的输出作为行动概率很容易陷入局部最优解，即使使用 $\epsilon$-贪心的方式也很难摆脱。受 AlphaGo 和 AlphaGo Zero 的启发，本节使用蒙特卡罗树搜索的方式进行前向式搜索。在 $t$ 时刻，算法在策略和价值网络的辅助下执行一次蒙特卡罗树搜索，得到搜索策略 $\mathbb{\pi}$，并根据 $\pi$ 确定下一个行动的位置。
+
+\begin{algorithm}[!htbp]
+\caption{TreeSearch}\label{alg:TreeSearch}
+
+\begin{algorithmic}[1]
+\STATE \textbf{Input:} root $s_R$, value $V$, policy $\pi$, search times $K$
+\STATE \textbf{Output:} Search policy $\mathbf{\pi}$
+\FOR{$k = 0$~$\text{to}$~$K-1$}
+\STATE $s_L\leftarrow s_R$
+\STATE {\{Selection\}}
+\WHILE{$s_L \textrm{ is not a leaf node}$}
+  \STATE $a \leftarrow \arg\max_{a\in\mathcal{A}(s_L)} Q(s_L, a) +\lambda \cdot U(s_L, a)$\Comment{Eq.~(\ref{eq:Selection})}
+  \STATE $s_L \leftarrow \textrm{ child node pointed by edge }(s_L, a)$
+\ENDWHILE
+
+\STATE {\{Evaluation and expansion\}}
+%\IF{$s_L$ can be expanded}
+    \STATE $v\leftarrow V(s_L)$ \COMMENT{simulate $v$ with value function $V$}
+  \FOR{$\text{all }a \in\mathcal{A}(s_L)$}
+    \STATE Expand an edge $e$ to node $ s = [s_L.\mathbf{Q}_t, s_L.\mathbf{D}_t, s_L.\mathbf{F}_t]$
+    \STATE $e.P \leftarrow p(a|s_L); e.Q \leftarrow 0; e.N \leftarrow  0$\COMMENT{init edge properties}
+  \ENDFOR
+%\ELSE
+% \State{$v\leftarrow\left\{\begin{array}{cl} V(s_L) & R= NULL\textrm{ or }J=\emptyset \\ R(s_L.\mathcal{Z}, J) & \textrm{others}\\ \end{array} \right.$}\Comment{simulate with $V$ at test phase ($R=NULL$ or $J=\emptyset$), or directly set to its real value (e.g., $\alpha$-NDCG) at the training phase}
+%\ENDIF
+\STATE {\{Back-propagation\}}
+\WHILE{$s_L \neq s_R$}
+  \STATE $s \leftarrow \textrm{ parent of }s_L; e \leftarrow \textrm{ edge from }s\textrm{ to }s_L$
+  \STATE $e.Q \leftarrow \frac{e.Q\times e.N + v}{e.N + 1}$\COMMENT{Equation~(\ref{eq:UpdateQN})}
+  \STATE $e.N \leftarrow e.N + 1; s_L \leftarrow s$
+\ENDWHILE
+\ENDFOR
+
+\STATE {\{Calculate tree search policy. Eq.~(\ref{eq:SearchProb})\}}
+\FOR{$\text{all }a\in\mathcal{A}(s_R)$}
+  \STATE $\pi(a|s_R)\leftarrow \frac{e(s_R, a).N}{\sum_{a'\in\mathcal{A}(s_R)}e(s_R, a').N}$
+\ENDFOR
+\RETURN $\mathbf{\pi}$
+\end{algorithmic}
+\end{algorithm}
+
+Alg~\ref{alg:TreeSearch} 展示了蒙特卡罗树搜索的细节，其中每一个树节点对应一个状态。算法以根节点 $s_R$、值函数 $\mathcal{V}$ 以及策略函数 $\pi$ 作为输入，输出策略 $\mathbb{\pi}$。算法会迭代 $K$ 次，每次从 $s_P$ 开始选择一个方向移动。搜索树中每条边$e(s,a)$都存储着行动价值 $Q(s,a)$ 参观次数 $N(s,a)$ 以及先验概率 $\pi(s,a)$。每次迭代式，会执行以下操作：
+
+\begin{enumerate}
+	\item 选择：每次迭代都从根节点 $s_R$ 开始，以最大化上限置信区间为目标选择行动：
+\begin{equation}\label{eq:Selection}
+  a_t = \arg\max_a (Q(s_t, a) + \lambda U(s_t, a)),
+\end{equation}
+式中 $\lambda >0$ 是权衡系数，$U(s_t, a) =  p(a|s_t)\frac{\sqrt[]{\sum_{a'\in\mathcal{A}(s_t)} N(s_t, a')}}{1 + N(s_t, a)}$. $U(s_t, a)$ 和先验概率有关但是随着参观次数的增加而逐渐减小。
+
+\end{enumerate}}
+
 
 %%%%%%% 结论 %%%%%%%
 
