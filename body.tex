@@ -873,15 +873,86 @@ AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由�
 
 蒙特卡罗树搜索每次循环包含四步：
 \begin{enumerate}
-	\item 选择（Selection）：
-	\item 扩展（Expansion）：
-	\item 仿真（Simulation）：
-	\item 反向传播（Back propagation）：
+	\item 选择（Selection）：从根节点 R 开始，一次选择最佳的子节点，直到达到叶节点。选择最佳子节点的难点主要在于探索和利用的平衡：探索可以保证充分探索解空间，以便找到未访问的点中受益较大的点；利用则能充分利用现有模拟结果以加快搜索速度。
+	
+	解决该平衡问题的方法被称为用于树搜索的上限置信区间算法\cite{Kocsis2006BanditBM}（Upper Confidence Bounds for trees，UCT）该方法基于上限置信区间算法\cite{Auer2002FinitetimeAO}（Upper Confidence Bounds 1，UCB1），建议在选择子节点时，最大化 $\frac{w_i}{n_i} +c\sqrt{\frac{\ln N_i}{n_i}}$ 为目标。式中 $w_i$ 表示第 $i$ 次移动后的取胜次数（利用）；$n_i$ 表示第 $i$ 次移动后的仿真次数（探索）；$N_i$ 表示总仿真次数，$c$ 表示探索参数。
+
+	\item 扩展（Expansion）：如果游戏没有结束，那么扩展叶节点，将一个或多个可用节点添加为该叶节点的子节点，并选择其中的一个子节点作为 C。
+
+	\item 仿真（Simulation）：从节点C开始，用随机策略选择节点进行游戏。
+	\item 反向传播（Back propagation）：根据仿真的结果更新从C到R的节点。
 \end{enumerate}
 
+\begin{figure}[!htbp]
+\vspace{1em}
+\centering
+  \includegraphics[width=1.0\linewidth]{figures/MCTS}
+  \caption{蒙特卡洛树搜索步骤}
+  \label{fig:MCTS}       % Give a unique label
+\vspace{1em}
+\end{figure}
 
 
-\subsection{围棋中的}
+\subsection{围棋中的蒙特卡洛树搜索应用}
+\label{sec:AlphaGo}
+AlphaGo算法中存在3个网络：使用监督学习训练的策略网络 $p_\sigma$ 以及该网络的简化版 $p_\pi$；使用强化学习训练的策略网络 $p_\rho$ 以及价值网络 $v_\theta$。在树搜索的过程中，$p_\sigma$被用作模拟人类棋手落子；$p_\rho$ 决定落子位置， $v_\theta$判断当前局势。
+
+$p_\sigma$ 的训练数据来自于 KGS 的三千万棋局，利用每个棋局及其对应的落子的数据，训练得到概率分布 $p_\sigma(a|s)$，即在当前状态（棋局）下采取行动（落子）的概率。由于 $p_\rho$ 网络结构比较复杂，推导速度较慢，因此在AlphaGo算法训练时采用简化版的 $p_\pi$ 以降低训练速度；推导时采用 $p_\sigma$ 以提高胜率。
+
+\begin{figure}[!htbp]
+\vspace{1em}
+\centering
+  \includegraphics[width=1.0\linewidth]{figures/Alpha_GO}
+  \caption{AlphaGo 的树搜索过程}
+  \label{fig:Alpha_Go}       % Give a unique label
+\vspace{1em}
+\end{figure}
+
+蒙特卡洛树搜索使用随机进行仿真，Alpha Go 利用价值网络辅助策略网络作为落子参考进行仿真。图\ref{fig:Alpha_Go}中每一条边 $(s,a)$ 都包含了行动价值 $Q(s,a)$，该节点的访问次数 $N(s,a)$ 以及先验概率 $P(s,a) = p_\sigma(a|s)$。每次仿真从根节点开始根据当前状态 $s_t$ 选择行动 $a_t$ 直至到达叶节点。
+\begin{equation}
+\label{eq:MCTS_selection}
+\begin{aligned}
+&a_t = \arg \max_a (Q(s_t, a)+u(s_t, a)) \\
+&u(s_t, a) \propto \frac{P(s,a)}{1+N(s,a)}
+\end{aligned}
+\end{equation}
+
+叶节点的重要程度由价值网络 $v_\theta$ 和策略网络 $p_\pi$ 输出 $z_L$ 确定。
+\begin{equation}
+\label{eq:MCTS_leaf}
+\begin{aligned}
+V(s_L) = (1-\lambda)v_{\theta}(s_L) + \lambda z_L
+\end{aligned}
+\end{equation}
+
+模拟结束时，所有边的行动价值以及参观次数都会被更新。
+\begin{equation}
+\label{eq:update}
+\begin{aligned}
+N(s,a) &= \sum_{i=1}^{N} \mathbf{1}(s,a,i) \\
+Q(s,a) &= \frac{1}{N(s,a)} \sum_{i=1}^{N} \mathbf{1}(s,a,i) V(s_L^i)
+\end{aligned}
+\end{equation}
+
+式中 $s_L^i$ 表示第 $i$ 次仿真的叶节点， $\mathbf{1}(s,a,i)$ 表示边 $(s,a)$ 是否被访问过。
+
+AlphaGo Zero 是对 AlphaGo 的改进。相对于AlphaGo，AlphaGo Zero主要改进了以下几点：
+
+\begin{enumerate}
+	\item AlphaGo Zero 是一个自训练的强化学习过程，直接用棋盘状态作为训练样本，不需要任何人类的先验知识，
+	\item AlphaGo Zero采用了新的网络架构。将Alpha Go中的策略网络和价值网络融合成为一个网络，因为策略网络和价值网络的输入层和网络隐层的结构完全一样，只不过前者输出落子概率向量，后者输出当前局面的赢棋概率。
+	\item AlphaGo Zero采用了深度残差网络（Deep Residual Network）缓解了卷积神经网络中的梯度消失问题，网络深度加深，扩展了网络的解释能力
+
+\end{enumerate}
+
+AlphaGo Zero使用了一个参数为 $\theta$ 的深度网络 $f_{\theta}$ ，该网络将棋盘作为输入，输出对应的概率和值函数 $(\mathbf{p}, v) = f_{\theta}(s)$ ，式中 $\mathbf{p}$ 表示行动（落子）的概率 $p_a = Pr(a|s)$，$v$是一个标量，表示当前棋局的胜率。
+
+
+深度网络的训练仍然采用蒙特卡洛树搜索的方法。
+
+
+
+
 
 %%%%%%% 结论 %%%%%%%
 
