@@ -897,7 +897,7 @@ AUC就是ROC曲线和坐标轴相交部分覆盖的面积大小，ROC曲线由�
 \label{sec:AlphaGo}
 AlphaGo算法中存在3个网络：使用监督学习训练的策略网络 $p_\sigma$ 以及该网络的简化版 $p_\pi$；使用强化学习训练的策略网络 $p_\rho$ 以及价值网络 $v_\theta$。在树搜索的过程中，$p_\sigma$被用作模拟人类棋手落子；$p_\rho$ 决定落子位置， $v_\theta$判断当前局势。
 
-$p_\sigma$ 的训练数据来自于 KGS 的三千万棋局，利用每个棋局及其对应的落子的数据，训练得到概率分布 $p_\sigma(a|s)$，即在当前状态（棋局）下采取行动（落子）的概率。由于 $p_\rho$ 网络结构比较复杂，推导速度较慢，因此在AlphaGo算法训练时采用简化版的 $p_\pi$ 以降低训练速度；推导时采用 $p_\sigma$ 以提高胜率。
+$p_\sigma$ 的训练数据来自于 KGS 的三千万棋局，利用每个棋局及其对应的落子的数据，训练得到概率分布 $p_\sigma(a|s)$，即在当前状态（棋局）下采取行动（落子）的概率。不过，由于 $p_\rho$ 的网络结构比较复杂，推导速度较慢，因此，AlphaGo算法在训练时采用简化版的 $p_\pi$ 网络，以降低训练速度；在推导时采用 $p_\sigma$ 网络，以提高胜率。
 
 \begin{figure}[!htbp]
 \vspace{1em}
@@ -925,7 +925,7 @@ V(s_L) = (1-\lambda)v_{\theta}(s_L) + \lambda z_L
 \end{aligned}
 \end{equation}
 
-模拟结束时，所有边的行动价值以及参观次数都会被更新。
+在模拟结束时，所有边的行动价值以及参观次数都会被更新，如式\ref{eq:update}
 \begin{equation}
 \label{eq:update}
 \begin{aligned}
@@ -940,14 +940,16 @@ AlphaGo Zero 是对 AlphaGo 的改进。相对于AlphaGo，AlphaGo Zero主要改
 \begin{enumerate}
 	\item AlphaGo Zero 是一个自训练的强化学习过程，直接用棋盘状态作为训练样本，不需要任何人类的先验知识，
 	\item AlphaGo Zero采用了新的网络架构。将Alpha Go中的策略网络和价值网络融合成为一个网络，因为策略网络和价值网络的输入层和网络隐层的结构完全一样，只不过前者输出落子概率向量，后者输出当前局面的赢棋概率。
-	\item AlphaGo Zero采用了深度残差网络（Deep Residual Network）缓解了卷积神经网络中的梯度消失问题，网络深度加深，扩展了网络的解释能力。
+	\item AlphaGo Zero采用了深度残差网络（Deep Residual Network）在某种程度上缓解了卷积神经网络中的梯度消失问题，网络深度加深，扩展了网络的解释能力。
 
 \end{enumerate}
 
 AlphaGo Zero使用了一个参数为 $\theta$ 的深度网络 $f_{\theta}$ ，该网络将棋盘作为输入，输出对应的概率和值函数 $(\mathbf{p}, v) = f_{\theta}(s)$ ，式中 $\mathbf{p}$ 表示行动（落子）的概率 $p_a = Pr(a|s)$，$v$是一个标量，表示当前棋局的胜率。
 
 
-深度网络的训练仍然采用蒙特卡洛树搜索的方法。在时刻 $t$ 使用$f_{\theta}$的输出作参考进行下一轮蒙特卡洛树搜索，每一轮的树搜索都会输出当前状态（棋局）下每个行动（落子）的概率 $\pi$ 蒙特卡洛树搜索得到的落子概率比直接$f\theta$ 得到的落子概率更强，因此蒙特卡洛树搜索可以被认为是一个策略提升（Policy Improvement）的过程。利用 $\pi$进行落子后，不断循环至到期具结书。在棋局结束后，将对弈者的胜负情况$z$作为价值更新参数。最后更新$f_\theta$的网络参数以让$f_\theta$的输出的骡子概率和胜率 $(\mathbf{p},v)$ 尽可能接近$(\pi,z)$ ，并在后面的棋局中使用新的参数来进行自对弈。
+深度网络的训练仍然采用蒙特卡洛树搜索的方法。在时刻 $t$ 使用$f_{\theta}$的输出作参考进行下一轮蒙特卡洛树搜索，每一轮的树搜索都会输出当前状态（棋局）下每个行动（落子）的概率 $\pi$ 蒙特卡洛树搜索得到的落子概率比直接$f\theta$ 得到的落子概率更强，因此蒙特卡洛树搜索可以被认为是一个策略提升（Policy Improvement）的过程。
+
+利用 $\pi$进行落子后，不断循环至到棋局结束。在棋局结束后，将对弈者的胜负情况$z$作为价值更新参数。最后更新$f_\theta$的网络参数以让$f_\theta$的输出的骡子概率和胜率 $(\mathbf{p},v)$ 尽可能接近$(\pi,z)$ ，并在后面的棋局中使用新的参数来进行自对弈。
 
 $f_\theta$的损失函数为：
 \begin{equation}
@@ -961,12 +963,12 @@ $f_\theta$的损失函数为：
 蒙特卡洛树搜索以及参数更新的相关部分参考\ref{sec:MCTS_intro}节。
 
 \section{蒙特卡洛树搜索增强的马尔可夫决策过程的文本匹配建模}
-再上一章，本文对文本匹配算法的MDP进行了介绍。受到AlphaGo和Alphaha  的启发，本章尝试将蒙特卡洛树搜索方法应用于文本匹配中。我们将本章提出的方法称为MM-Match（MCTS enhanced MDP for Matching）。
+在上一章，本文对文本匹配算法的MDP进行了介绍。受到AlphaGo和Alphaha  的启发，本章尝试将蒙特卡洛树搜索方法应用于文本匹配中。我们将本章提出的方法称为MM-Match（MCTS enhanced MDP for Matching）。
 
 \begin{figure}[!htbp]
 \vspace{1em}
 \centering
-  \includegraphics[width=0.8\linewidth]{figures/grid}
+  \includegraphics[width=0.9\linewidth]{figures/grid}
   \caption{MM-Match 算法结构}
   \label{fig:MCTS_sum}       % Give a unique label
 \vspace{1em}
@@ -988,6 +990,7 @@ s_t &= [\mathbf{Q}_t, \mathbf{D}_t, \mathbf{F}_t]
 式中 $q_t$ 和 $d_t$ 仍然表示当前位置， $\mathbf{Q}_t$ 和 $\mathbf{D}_t$ 表示输入的句子对 $Q, D$ 的前 $q_t$ 和 $d_t$ 按照路径拉伸得到的序列，$\mathbf{F}_t$ 表示从当前位置 $q_t, d_t$ 向前看 $k$ 个单词得到的序列。
 
 	\item 动作$\mathcal{A}$：在每个时间$t$：向包括右、下、右下三个方向中的某个移动一步。
+	
 	\item 状态转移函数$\mathcal{T}(S,\mathcal{A})$：状态转移函数$\mathcal{T}:S\times \mathcal{A}\rightarrow S$ 被定义为：
 \begin{equation}
 \label{eq:MCTS_translation}
@@ -999,6 +1002,7 @@ s_t &= [\mathbf{Q}_t, \mathbf{D}_t, \mathbf{F}_t]
 \end{aligned}
 \end{equation}
 在每个时间 $t$：系统根据当前的状态选择一个行动(移动方向)，并根据方向移动到下一个位置，状态随之转移：将当前位置两个句子的词向量分别添加到对应路径的末尾，更新未来单词序列。完成转移后，再根据当前状态继续移动。
+
 	\item 值函数 $V$：值函数 $V: S\rightarrow \mathbb{R}$ 是对当前模型是否可以得到正确预测结果的预测。值函数需要不断更新以更加准确的得到预测结果。本节提出的值函数需要用到2个LSTM将 $Q_t$ 和 $D_t$ 映射为2个一维向量，并将结果定义为对这两个向量加权和的非线性转换：
 \begin{equation}
 \label{eq:MCTS_value}
@@ -1028,7 +1032,7 @@ LSTM 网络的定义和公式~\ref{eq:LSTM} 一致，LSTM$_Q$ 和 LSTM$_D$ 共�
 
 判别模型将 $\mathbf{Q}_t$ 和 $\mathbf{D}_t$ 作为输入，并使用两个 LSTM 将其映射为2个矩阵，最后使用一个 LSTM 接受两个矩阵作为输入，输出一个一维向量：
 \begin{equation}
-\label{eq:MCTS_policy}
+\label{eq:path_classification}
 \begin{aligned}
 \mathbf{g}_q &= \mathrm{LSTM}_Q(Q_t)\\
 \mathbf{g}_d &= \mathrm{LSTM}_D(D_t)\\
@@ -1052,7 +1056,7 @@ p_m = \frac{1}{1+e^{-{\mathbf{g}_c^{\text{out}}}}}
 \vspace{1em}
 \end{figure}
 
-\subsection{蒙特卡罗树搜索的训练和推断}
+\section{蒙特卡罗树搜索的训练和推断}
 \label{sec:MCTS_train}
 在\ref{sec:lab_value} 节，本文通过在大数据和小数据集上的训练结果发现单纯将策略函数的输出作为行动概率很容易陷入局部最优解，即使使用 $\epsilon$-贪心的方式也很难摆脱。受 AlphaGo 和 AlphaGo Zero 的启发，本节使用蒙特卡罗树搜索的方式进行前向式搜索。在 $t$ 时刻，算法在策略和价值网络的辅助下执行一次蒙特卡罗树搜索，得到搜索策略 $\mathbb{\pi}$，并根据 $\pi$ 确定下一个行动的位置。
 
@@ -1066,7 +1070,7 @@ p_m = \frac{1}{1+e^{-{\mathbf{g}_c^{\text{out}}}}}
 \STATE $s_L\leftarrow s_R$
 \STATE {\{Selection\}}
 \WHILE{$s_L \textrm{ is not a leaf node}$}
-  \STATE $a \leftarrow \arg\max_{a\in\mathcal{A}(s_L)} Q(s_L, a) +\lambda \cdot U(s_L, a)$\Comment{Eq.~(\ref{eq:Selection})}
+  \STATE $a \leftarrow \arg\max_{a\in\mathcal{A}(s_L)} Q(s_L, a) +\lambda \cdot U(s_L, a)$\COMMENT{Eq.~(\ref{eq:Selection})}
   \STATE $s_L \leftarrow \textrm{ child node pointed by edge }(s_L, a)$
 \ENDWHILE
 
@@ -1105,13 +1109,170 @@ Alg~\ref{alg:TreeSearch} 展示了蒙特卡罗树搜索的细节，其中每一�
 \end{equation}
 式中 $\lambda >0$ 是权衡系数，$U(s_t, a) =  p(a|s_t)\frac{\sqrt[]{\sum_{a'\in\mathcal{A}(s_t)} N(s_t, a')}}{1 + N(s_t, a)}$. $U(s_t, a)$ 和先验概率有关但是随着参观次数的增加而逐渐减小。
 
-\end{enumerate}}
+	\item 评价扩展：到达叶节点时，节点会根据值函数 $V(s_L)$（式\ref{eq:MCTS_value}），计算当前节点的价值。如果搜索过程没有结束，则该节点需要被扩展。新的叶节点状态 $s_L$ 会被初始化为 $\pi(s_L,a) = \pi(a|s_L)$（式\ref{eq:MCTS_policy}），$Q(s_L,a) = 0$，$N(s_L,a) = 0$。本节介绍的算法会始终扩展叶节点知道到达矩阵的右下角。
+	
+	\item 回溯更新：评价结束时，每条边都会被更新：
+\begin{equation}
+\label{eq:back update}
+\begin{aligned}
+	&Q(s, a) \leftarrow  \frac{Q(s, a) \times N(s, a) + V(s_L)}{N(s, a) + 1}\\
+ 	&N(s, a) \leftarrow  N(s, a) + 1.
+\end{aligned}
+\end{equation}
+	
+	\item 计算策略：在 $K$ 次迭代结束后，根据根节点 $s_R$ 每条边的访问次数确定每个行动的概率：
+	\begin{equation}
+\label{eq:SearchProb}
+\begin{aligned}
+	\pi(a|s_R) = \frac{N(s_R, a)^{\frac{1}{\tau}}}{\sum_{a'\in\mathcal{A}(s_R)} N(s_R, a')^{\frac{1}{\tau}}}
+\end{aligned}
+\end{equation}
+式中 $\tau>0$ 表示系统温度。	
+\end{enumerate}
+
+\subsection{模型训练}
+本章提出的模型的参数 $\Theta_{MCTS}$(包含 $\mathbf{w}, b_v, \mathbf{U}_p$, 以及 LSTM$_D$, LSTM$_Q$ 和 LSTM$_F$中的参数)，$\Theta_{c}$(包含LSTM$_D$, LSTM$_Q$ 和 LSTM$_c$ 中的参数)需要在训练时被更新。在训练阶段，算法接受 $N$ 个标记的句子对 $D = \{ (\mathbf{Q}^{(n)}, \mathbf{D}^{(n)}), \mathbf{Y}\}_{n=1}^{N}$。算法~\ref{alg:Train}展示了整个训练过程。首先将参数  $\Theta_{MCTS}$ 和 $\Theta_{c}$ 初始化为 $[-1, 1]$ 的随机数，每轮迭代时，对于每个句子对 $(\mathbf{Q}, \mathbf{D})$，我们都需要预测一条路径。在每个时间 $t$都会执行一次蒙特卡洛树搜索，并输出策略 $\mathbb{\pi}$，根据策略随机采样出对应的移动方向 $a_t$，直到到达匹配矩阵的右下角。在得到一条路径 $([u_{q_1}, u_{q_2}, \cdots, u_{q_t}], [v_{d_1}, v_{d_2}, \cdots, v_{d_t}])$ 后，使用交叉熵损失更新路径判别模型：
+
+\begin{equation}
+\label{eq:classification_loss}
+\ell_c(Y, p) = -\left(Y\log(p) + (1-Y)\log (1-p)\right)
+\end{equation}
+
+在路径判别模型收敛后，对每条路径进行预测得到标签 $Y_p$，并根据 $Y_p$ 与实际标签 $Y$ 计算奖励 $r= \mathbb{I}_{\mathbf{Y} = \mathbf{Y}_p}$。蒙特卡罗树搜索中每一轮生成的数据 $E=\{s_t, \mathbb{\pi}_t\}$ 以及 $r$ 会被用作更新价值和策略网络，使其输出的值 $V(s_t)$和策略$\mathbb{p}(s_t)$ 尽可能逼近 $r$ 和 $\mathbb{p}(s_t)$。该网络的损失函数为：
+\begin{equation}
+\label{eq:loss}
+\begin{aligned}
+  \ell(E, r) = &\sum_{t=1}^{|E|} (-(r\log V(s_t) + (1-r)\log (1-V(s_t)))  \\
+  &+ \beta\sum_{a\in\mathcal{A}(s_t)}\pi_t(a|s_t) \log \frac{1}{\pi(a|s_t)}).
+\end{aligned}
+\end{equation}
+模型通过反向传播和离散梯度下降更新。
+
+\begin{algorithm}[!htbp]
+\caption{Train MM-Match}\label{alg:Train}
+
+\begin{algorithmic}[1]
+\STATE \textbf{Input:} Labeled data $D=\{ (\mathbf{D}^{(n)}, \mathbf{Q}^{(n)}, \mathbf{Y}^{(n)})\}_{n=1}^N$, learning rate $\eta$,search times $K$
+\STATE \textbf{Output:} $\Theta_{MCTS}, \Theta_{c}$
+\STATE \text{Initialize} $\Theta_{MCTS}, \Theta_{c} \leftarrow$ random values in $[-1, 1]$
+\REPEAT
+  \FOR{$(\text{all }\mathbf{X}, \mathbf{Y})\in D$}
+    \STATE {$s \leftarrow [\{\mathbf{u}_1\}, \{\mathbf{v}_1\}, \{[\mathbf{u}_1,\mathbf{v}_1], \cdots, [\mathbf{u}_k, \mathbf{v}_k]\}]$}
+    \WHILE{not reach right down corner}
+            \STATE $\mathbb{\pi} \leftarrow \mathrm{TreeSearch}(s, V, \mathbf{p}, K)$ \COMMENT{Alg.~(\ref{alg:TreeSearch})}
+      \STATE sample action ${a\in\mathcal{A}(s)}$ according to $\pi(a|s)$
+      \STATE $E\leftarrow E \oplus \{(s, \mathbb{\pi})\}$
+      %\State $[\mathbf{q}, \mathcal{Z}, X]\leftarrow s$
+      \STATE $s \leftarrow [s.\mathbf{Q}_{t+1}, s.\mathbf{D}_{t+1}, s.\mathbf{F}_{t+1}]$
+    \ENDWHILE
+    \WHILE{\text{not convergence}}
+    \STATE $\Theta_{c} \leftarrow \Theta_{c} - \eta \frac{\partial \ell_c(\mathbf{Y}, p)}{\partial \Theta_{c}}$  \COMMENT{$\ell_c$ is defined in Eq.~(\ref{eq:classification_loss})}
+    \ENDWHILE
+    \STATE compute $\mathbf{Y}_p$ by Eq.~(\ref{eq:classification_model})
+    \STATE $r \leftarrow \mathbb{I}_{\mathbf{Y} = \mathbf{Y}_p}$
+    \STATE $\Theta_{MCTS} \leftarrow \Theta_{MCTS} -\eta \frac{\partial \ell(E, r)}{\partial \Theta_{MCTS}}$ \COMMENT{$\ell$ is defined in Eq.~(\ref{eq:loss})}
+  \ENDFOR
+\UNTIL {converge}
+\STATE\RETURN $\Theta_{MCTS}, \Theta_{c}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{模型推断}
+算法~\ref{alg:Train}展示了模型的推断过程。给定一个句子对 $\mathbf{Q}, \mathbf{D}$，系统的初始化状态 $s_1=[\{\mathbf{u}_1\}, \{\mathbf{v}_1\}, \{[\mathbf{u}_1,\mathbf{v}_1], \cdots, [\mathbf{u}_k, \mathbf{v}_k]$。在每个时间节点 $t$，主体都会得到系统的状态 $s_t=[\mathbf{Q}_t, \mathbf{D}_t, \mathbf{F}_t]$ 以及蒙特卡罗树搜索得到的策略 $\mathbb{\pi}$，根据 $\mathbb{\pi}$ 做出行动后更新当前状态得到 $s_{t+1}$。该过程不断持续直到到达匹配矩阵的右下角。
+
+\begin{algorithm}[!htbp]
+\caption{Text MM-Match}\label{alg:RLRank_MCTS}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\begin{algorithmic}[1]
+\STATE \textbf{Input:} sentence pair $\mathbf{Q}=\{\mathbf{u}_1, \cdots, \mathbf{u}_M\}$, $\mathbf{D}=\{\mathbf{w}_1, \cdots, \mathbf{w}_M\}$, value function $V$, policy function $\mathbf{p}$, and search times $K$,
+\STATE \textbf{Ouput:} $\mathbf{Y}$
+\STATE $s \leftarrow [\{\mathbf{u}_1\}, \{\mathbf{v}_1\}, \{[\mathbf{u}_1,\mathbf{v}_1], \cdots, [\mathbf{u}_k, \mathbf{v}_k]\}]$
+\WHILE{not reach right down corner}
+  \STATE $\mathbb{\pi} \leftarrow \mathrm{TreeSearch}(s, V, \mathbf{p}, K)$
+  \STATE $a \leftarrow \arg\max_{a\in\mathcal{A}(s)} \pi(a|s)$
+% \State $[\mathbf{X}, \mathbf{Y}]\leftarrow s$
+  \STATE $s \leftarrow [s.\mathbf{Q}_{t+1}, s.\mathbf{D}_{t+1}, s.\mathbf{F}_{t+1}]$
+\ENDWHILE
+\STATE compute $\mathbf{Y}_p$ by Eq.~(\ref{eq:classification_model})
+\STATE \RETURN $\mathbf{Y_p}$
+\end{algorithmic}
+\end{algorithm}
+
+
+\section{实验分析}
+为了对我们提出的基于蒙特卡罗树搜索的文本匹配算法有效性进行评估，我们利用 Quora 的问题匹配数据集进行了测试。实验设置和 \ref{sec:lab_value} 节相同。由于蒙特卡洛树搜索的时间较长，因此我们只在小数据集上进行的测试。
+\begin{table}[htbp]
+\caption{基于蒙特卡罗树搜索的文本匹配算法测试结果}\label{tab:MCTS_small_test}
+\vspace{0.5em}\centering\wuhao
+\begin{tabular}{ccccc}
+\toprule[1.5pt]
+	\multirow{2}{*}{Algorithm} &
+	\multicolumn{3}{c}{\multirow{1}{*}{Evaluation Criterion}} \\
+	\cline{2-4} & ACC & F1 & AUC \\
+	\midrule[1pt]
+	MM-Match & $\textbf{0.6776}(*)$ & $\textbf{0.6845}(*)$ & $\textbf{0.7371}(*)$ \\
+    MatchPyramid & $0.6671$ & $0.6702$ & $0.7237$ \\
+    MatchSRNN & $0.6617$ & $0.6736$ & $0.7285$\\
+\bottomrule[1.5pt]
+\end{tabular}
+\vspace{\baselineskip}
+\end{table}
+
+可以发现MM-Match在3个评价指标上均大幅度领先于 MatchPyramid 和 MatchSRNN。
+
+从收敛速度上来看，我们的算法继承了算法\ref{alg:TM_train} 的优点，收敛速度同样很快。类似的，我们也在上面实验中的一折数据上统计了验证集和测试集的auc随轮数的变化情况：
+
+\begin{figure}[!htbp]
+\vspace{1em}
+\centering
+  \includegraphics[width=0.8\linewidth]{figures/MCTS_line}
+  \caption{MM-Match 树搜索节点访问次数}
+  \label{fig:MCTS_line}       % Give a unique label
+\vspace{1em}
+\end{figure}
+x
+观察图\ref{fig:MCTS_line} 可以发现，MM-Match 的收敛速度明显快于 VIM，算法在20轮不到就已经收敛。
+
+为了实际查看蒙特卡罗树搜索访问的节点，我们将算法 \ref{alg:TreeSearch} 访问节点数可视化：
+
+\begin{figure}[!htbp]
+\vspace{1em}
+\centering
+  \includegraphics[width=0.4\linewidth]{figures/MCTS_exp_path}
+  \caption{MM-Match 树搜索节点访问次数}
+  \label{fig:MCTS_exp_path}       % Give a unique label
+\vspace{1em}
+\end{figure}
+
+图 \ref{fig:MCTS_exp_path} 是在输入的句子对为 How do I think positive in life? What is the best way to a positive life 的情况下第一次树搜索后各个节点的访问次数，可以发现右上角和左下角明显为空，而对角线处的访问次数明显最高。
+
+\section{本章小结}
+本章主要介绍了基于蒙特卡罗树搜索的文本匹配算法。首先我们对上一章提出的 MDP 进行了改进，加入了路径信息。路径信息的引入使得价值网络的预测更加精确。
+
+为了解决直接使用价值网络输出的值函数会导致算法陷入局部最优解的问题，本章引入了蒙特卡罗树搜索算法，通过蒙特卡罗树搜索算法增强搜索策略的可用性，也解决了文本匹配中由于语言组合结构带来的语义区分问题。
+
+最后本文在quora数据集上进行了测试，实验结果表明本文提出的模型具有优异的性能。
+
+\chapter{总结与展望}
+近年来，计算机以及智能终端设备的存储和计算能力不断增强，互联网的信息量呈现爆炸式增长。信息量的增加既为人们的生活带来了便捷，也给人们提出了巨大的挑战。据统计，google每天新增的索引网页页数高达40亿。在海量的信息面前如何高效的获取信息以及如何去除冗余信息成了很多人需要面对的问题。
+
+文本是人类数千年历史中主要的信息载体。虽然移动互联网时代的到来大大方便了视频和音频的传播，但是文本依然是人类目前最普遍和高效的信息获取手段。文本匹配作为信息检索和冗余文本消除的基础技术手段，一直受到学术界和工业界的高度重视。
+
+根据使用场景的不同，文本匹配可以被分为三类：短文本-短文本匹配，短文本-长文本匹配以及长文本-长文本匹配。短文本-短文本的匹配主要用于问答系统、问题复述等领域，先得到句子的矩阵表示后，利用深度网络提取句子的语义信息以及句子间的交互信息，将提取出的信息映射为一个概率分布；短文本-长文本的匹配往往需要用到主题模型等辅助，根据长文本的主题分布判断生成短文本的概率；长文本-长文本的匹配相对较少，同样需要利用主题模型等手段将长文本映射到一个高维向量空间，通过高维向量空间的距离衡量两个文本的相似度。
+
+一个优秀的文本匹配算法一般需要解决三个问题：1) 语言的多义性问题，即相同词语在不同环境下的语义问题；2) 语言的组合结构问题，即相同词语的顺序不同导致的语义不同；3) 匹配的非对称性问题，文本匹配任务中两个句子并不需要语义或者结构一致，如问答系统。
+
+为了解决这些问题，近年来有学者试图将深度学习应用于文本匹配任务，取得了巨大的成功。但是这些方法都试图利用深度学习抽取文本中的语义信息，目前对于计算机来说这仍然是不可能的任务，因此基于深度学习的方法具有天然的局限性。
+
+为了解决上述问题，文本利用强化学习抽取匹配过程中句子之间的交互信息。本文从三个角度出发，解决了利用强化学习抽取交互信息的主要难题。首先，本文针对于文本匹配的场景，利用马尔科夫决策过程建模匹配过程中路径的生成过程，利用值迭代方法对马尔科夫决策过程进行训练和预测，验证了马尔科夫决策过程的正确性；其次，利用蒙特卡罗树搜索向前看的特性解决文本匹配的组合结构问题，取得了良好的效果；最后本文对前面设计算法进行了并行实现，提升了算法的运行速度，为大规模分布式训练奠定了基础。
+
 
 
 %%%%%%% 结论 %%%%%%%
 
-\addcontentsline{toc}{chapter}{结\quad 论} %添加到目录中
-
-\chapter*{结\quad 论}
-
-
+%\addcontentsline{toc}{chapter}{结\quad 论} %添加到目录中
+%
+%\chapter*{结\quad 论}
+%
+%本文
