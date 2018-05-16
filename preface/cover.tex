@@ -16,13 +16,44 @@
 \cdate{\the\year~年~\the\month~月~\the\day~日}
 
 \cabstract{
-中文摘要一般在~400~字以内，简要介绍毕业论文的研究目的、方法、结果和结论，语言力求精炼。中英文摘要均要有关键词，一般为~3~—~7~个。字体为小四号宋体，各关键词之间要有分号。英文摘要应与中文摘要相对应，字体为小四号~Times New Roman，详见模板。
+随着计算机和互联网的飞速发展，互联网的信息量呈现爆炸式增长。信息量的增加既为人们的生活带来了便捷，也给人们提出了巨大的挑战。在海量的信息面前如何高效的获取信息以及如何去除冗余信息成了很多人需要面对的问题。文本匹配作为信息检索和冗余文本消除的基础技术手段，一直受到学术界和工业界的高度重视。同时许多自然语言处理中的任务例如信息获取，问答系统，机器翻译，对话系统等等，都可以被视为文本匹配问题。
+
+传统的文本匹配算法往往基于人工抽取的规则进行模式匹配，这导致规则复杂而且难以管理；因此目前对文本匹配的研究大都试图通过深度神经网络理解文本语义进行语义匹配。
+
+近年来，深度学习的进展大大增强了强化学习的表达能力。强化学习已经在围棋，游戏等方面达到甚至超越人类的水准。这给基于文本语义匹配带来了新的可能性。利用强化学习强大的表达能力，我们可以较少的计算量下得到更好的效果。
+
+:
+
+(1) 如何设计文本匹配的强化学习过程
+
+一个强化学习过程包括状态、动作、转移概率、奖励和策略。强化学习过程的设计会直接影响算法的效率和最终结果。针对于文本匹配场景，本文设计了强化学习中的状态、动作以及奖励函数，并基于值迭代 算法进行实现求解。通过这一方法，建模了文本匹配中的交互规则。本文设计的强化学习过程在大数据集场景下各个评价准则下均优于其他经典文本匹配算法的效果。
+
+(2) 如何避免模型陷入局部最优解
+
+基于值迭代的文本匹配模型虽然可以建模文本匹配中的交互规则，但是基于贪心的方法对于语言的组合结构问题有着天生的缺陷，同时在小数据集上需要精细的调参已达到最优效果。蒙特卡罗树搜索算法向前看$k$步的设计降低了局部最优解出现的可能性，因此本文基于蒙特卡罗树搜索算法设计了文本匹配模型，并与其他经典算法进行了对比。实现结果表明，基于蒙特卡罗树搜索的文本匹配模型具有显著的优势。
+
 }
 
-\ckeywords{关键词~1；关键词~2；关键词~3；……；关键词~7（关键词总共~3~—~7~个，最后一个关键词后面没有标点符号）}
+\ckeywords{文本匹配；强化学习；马尔科夫决策过程；蒙特卡洛树搜索}
 
 \eabstract{
-The upper bound of the number of Chinese characters is 400. The abstract aims at introducing the research purpose, research methods, research results, and research conclusion of graduation thesis, with refining words. Generally speaking, both the Chinese and English abstracts require the keywords, the number of which varies from 3 to 7, with a semicolon between adjacent words. The font of the English Abstract is Times New Roman, with the size of 12pt(small four).
+With the development of computer science and Internet, the amount of information is growing rapidly. The increase of information brings us convenience as well as difficulties. How to obtain information efficiently and remove redundant one among the massive information have become a problem that many people have to face. Text matching, as a basic technology for information retrieval and redundant text elimination, is widely used in the academic community and industry. At the same time, many tasks in natural language processing such as information retrieval, question answering systems, machine translation, dialogue systems, etc., can be considered as text matching problems.
+
+Traditional text matching algorithms are based on handcraft rules for pattern matching, which leads to complex rules and difficult management. It can’t satisfy users’ information inquiry day by day. Therefore, currently, the researches on text matching mostly concentrate on understanding text semantics by deep neural networks for semantic matching.
+
+Recently, reinforcement learning enhanced by deep learning methods has a stronger express ability. Reinforcement learning has reached or surpassed the level of humanity in terms of go, games and so on. This brings new possibilities to semantics-based text matching. We can get better result with less calculation amount by strong exporess ability of reinforcement learning.
+
+In this paper, we found the main issues in the text matching based on reinforcement learning are:
+
+(1) how to design reinforcement learning process for text matching
+
+A reinforcement learning process includes states, actions, transition probabilities, rewards, and policies. The design of the reinforcement learning algorithm directly affects the efficiency of the algorithm. This paper proposes a new reinforcement learning method with well-designed states, actions and reward function to tackle text matching problem, and implements solution based on value iterative algorithms. This method models the interaction rules on text matching. The reinforcement learning algorithm designed in this paper is superior to other classic text matching methods under the various evaluation criteria in large data set scenarios.
+
+(2) How to avoid local optimal solution
+
+Text-matching model based on value iteration can model the interaction rules in text matching, but the greedy method has a natural defect in the problem of the combinatorial structure of the language. At the same time, fine tuning parameters on the small data set is needed to reached the optimal effect. The lookahead Monte Carlo Tree Search algorithm reduce the possibility of local optimal solutions. Therefore, this paper proposes a text matching model based on the Monte Carlo Tree Search algorithm and compares it with other classical algorithms. The results show that the text matching model based on Monte Carlo search outperforms others.
+
+
 }
 
 \ekeywords{keyword 1, keyword 2, keyword 3, ……, keyword 7 (no punctuation at the end)}
