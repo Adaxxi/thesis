@@ -13,14 +13,13 @@
 
 语言是人类交流沟通的重要方式，人们的绝大部分知识也是以语言文字的形式记载和流传下来的，它在人类的社会生活中起着至关重要的作用。随着时代的发展，计算机越来越广泛地渗透到人类社会的各个领域，语言文字信息也逐渐数字化，互联网技术的迅猛发展，人们摆脱了信息贫乏的桎梏，进入了一个信息极度丰富的社会。
 
-在英剧《黑镜（Black Error）》中有一集是刻画女主人公在男友艾仕车祸去世后，在朋友的推荐下，利用艾仕在社交网络上留下的信息塑造了一个可以“完美”模仿艾仕的人工智能系统，可以和女主角语音交流。这个人工智能系统就是通过阅读艾仕的邮件、聊天记录等海量信息来了解他。理解语言这项人类的基本技能，也成为了众多科幻作品中人工智能的入门标配。在计算机学科和人工智能学科中，研究如何让机器理解语言已经成为了一个专门的研究领域，即自然语言处理。人工智能取得了一系列进展，并在各个领域取得了广泛应用，不过毋庸置疑的是，自然语言处理始终是实现自然人机交互愿望的一块重要技术基石。
+理解语言这项人类的基本技能，也成为了众多科幻作品中人工智能的入门标配。在计算机学科和人工智能学科中，研究如何让机器理解语言已经成为了一个专门的研究领域，即自然语言处理。人工智能取得了一系列进展，并在各个领域取得了广泛应用，不过毋庸置疑的是，自然语言处理始终是实现自然人机交互愿望的一块重要技术基石。
 
 自然语言处理的主要研究内容，是如何让计算机处理语言文字信息，以及实现人与计算机之间用自然语言进行有效沟通。然而，这是十分困难的，造成困难的根本原因是自然语言文本的各个层次上广泛存在的各种各样的歧义性，包括词语中的一词多义与多词同义、短语中多个词性所导致的语法歧义、句子中的语序不同却表达同样意义等等。解决这个问题可以抽象为判断两个文本是否匹配，比如：一个有歧义的文本表达的是一种含义，而另一个没有歧义的文本表达的也是同样的含义，若文本匹配系统判断两个文本匹配，则说明系统可以有效识别文本信息。
 
 文本匹配是自然语言处理领域中的核心问题之一，目标是对于两个文本，给出它们，求出相似度，进而判断其是否匹配。许多任务，如问题复述、阅读理解、信息检索、机器翻译、自动文摘系统都可以归结成文本匹配问题。问题复述，即对相同语义的不同表达，可以抽象为判断两个句子的语义是否匹配；阅读理解，可以抽象为文章中信息和所问题目之间的匹配；信息检索，可以抽象为检索词和文档的匹配，机器翻译可以抽象为两种不同语言之间的匹配；自动文摘可以抽象为文章和摘要之间的匹配。
 
 其中，以问题复述、信息检索、以及机器翻译为代表等多个任务，已经广泛应用在人们平时生活中的。问题复述可以应用在知乎、Quora等在线问答平台，用户可能会提问很多相似问题，判断两个问题是否表达了同样的语义，即两段文本是否匹配，十分重要。信息检索在生活中的应用，早已不止于人们耳熟能详的搜索引擎百度、谷歌，在微博、推特等社交媒体中，搜索已经作为独立的应用上线，微博搜索已经成为用户关注时事热点的主要来源，微信也提供了微信公众号文章搜索，历史记录搜索等，这些技术的关键都是文本匹配任务。因而文本匹配的研究具有重要的理论和应用价值。
-\cite{zhang2010tree}。
 
 \section{研究意义}
 对于文本匹配问题的研究，可以应用在自然语言处理绝大部分任务中。根据使用场景的不同，可分为三类：短文本-短文本匹配，短文本-长文本匹配，长文本-长文本匹配。
@@ -40,32 +39,35 @@
 阅读理解的时候，要将阅读中的问题和原文章进行短文本-长文本匹配，而理解长文本语义与句子间的连贯、上下文、句子的歧义性有很大关联，因而采取什么样的形式表达长文本也是一个很大的难点。同时短文本和长文本的匹配存在着匹配的非对称性问题。
 
 \subsection{长文本-长文本匹配}
-长文本和长文本的匹配的应用，相对较少。原因是长文本组织层次丰富，同时存在上下文关联情况，因而长文本之间匹配的应用，如新闻推荐，往往可以先提取摘要，然后将摘要进行匹配。新闻推荐还可以使用主题模型，先得到两个文本的主题分布，再通过计算两个多项分布的距离，反映出他们之间的匹配程度。
+长文本和长文本的匹配的应用，相对较少。原因是长文本组织层次丰富，同时存在上下文关联情况，因而长文本之间匹配的应用，如新闻推荐，往往可以先提取摘要，然后将摘要进行匹配。新闻推荐还可以使用主题模型，先得到两个文本的主题分布，再通过计算两个多项分布的距离，反映出他们之间的匹配程度。长文本-长文本的匹配往往用于新闻推荐等领域。
+
 
 \section{研究内容}
 
-文本匹配的研究方式主要可分为传统方法，和机器学习方法。传统方法主要基于人工提取特征、设计规则，一个好的模型依赖于提取出的优质特征、规则，因而耗费人力较大，规则难以维护，系统也较为复杂。
+文本匹配的研究方式主要可分为传统方法和机器学习方法。传统方法主要基于人工提取特征、设计规则，一个好的模型依赖于提取出的优质特征、规则，因而耗费人力较大，规则难以维护，系统也较为复杂。
 
 近几年来，随着深度学习在语音识别、计算机视觉取得了突出进展，文本匹配也成为了当前深度学习研究的热点问题。基于深度学习的文本匹配模型，是利用深度神经网络，从文本中直接提取模式，并计算匹配程度得分。由于它可以直接从大量的数据中，端到端的学习特征，节省了人力物力。文本匹配的研究人员提出了许多深度学习模型，分别在不同的具体任务上有效。其中一个模型MatchSRNN在匹配任务结束后，通过回溯找到了两个句子的匹配路径，这符合人类在判断两个句子是否匹配的自然过程。但是使用传统方法，或者深度学习方法来找到匹配路径，需要大量特征、以及标注数据，来定义正确的匹配路径，成本和复杂度较高。因而本文希望找到一种可以生成匹配路径的方法。
 
-最近，基于，在围棋领域战胜了人类高手李世石，引起了学术界的广泛关注。强化学习是机器学习的一个重要分支，一个完整的强化学习过程，可以让计算机由完全不了解任务，通过不断的尝试，从和环境的交互学习，最后找到规律，达到任务目的。强化学习算法本身就会和环境进行交互，从获得的奖励或惩罚中学习。这些奖或惩，其实就可以作为生成匹配路径的需要的大量数据，同时由于这种学习过程，强化学习在序列生成问题上表现突出，生成匹配路径本质是一种序列生成的过程，于是本文使用强化学习算法来模拟匹配路径的生成过程，从而计算匹配程度。
+最近，强化学习已经在围棋，游戏等方面达到甚至超越人类的水准。强化学习是机器学习的一个重要分支，一个完整的强化学习过程，可以让计算机由完全不了解任务，通过不断的尝试，从和环境的交互学习，最后找到规律，达到任务目的。强化学习算法本身就会和环境进行交互，从获得的奖励或惩罚中学习。这些奖或惩，其实就可以作为生成匹配路径的需要的大量数据，同时由于这种学习过程，强化学习在序列生成问题上表现突出，生成匹配路径本质是一种序列生成的过程，于是本文使用强化学习算法来模拟匹配路径的生成过程，从而计算匹配程度。
 
 基于上述现状，本文使用强化学习方法来建模文本匹配问题，采用了马尔可夫决策过程（Markov Decision Process，MDP）方法本文的主要贡献如下：
 
-针对文本匹配问题，设计了马尔可夫决策过程中的状态、动作、价值函数以及奖励函数，实现了基于价值迭算法（value iteration）的文本匹配模型，在在线问答平台 Quora 数据集训练模型，并进行优化，与经典的深度学习的文本匹配模型MatchPyramid 和 MatchSRNN 的结果进行比较，实验结果表明基于价值迭代算法的文本匹配模型，在各个评价准则下均优于其他经典文本匹配算法的效果。
+针对文本匹配问题，设计了马尔可夫决策过程中的状态、动作、价值函数以及奖励函数，实现了基于价值迭代算法（Value Iteration）的文本匹配模型，在真实数据集训练模型，与经典的深度学习的文本匹配模型的结果进行比较，实验结果表明基于价值迭代算法的文本匹配模型，在各个评价准则下均优于其他经典文本匹配算法的效果。
+
+基于值迭代的文本匹配模型虽然可以建模模式匹配中的规则，但是基于贪心的方法对于语言的组合结构问题有着天生的缺陷，同时在小数据集上需要精细的调参已达到最优效果。蒙特卡罗树搜索算法向前看$k$步的设计降低了局部最优解出现的可能性，因此本文基于蒙特卡罗树搜索算法设计了文本匹配模型，并与基于值迭代文本匹配模型以及其他经典算法进行了对比。实现结果表明，基于蒙特卡罗树搜索的文本匹配模型具有显著的优势。
 
 \section{本文组织结构}
 本文共分为六章，每章节的内容组织如下：
 
 第一章为绪论部分，主要介绍了文本匹配任务的研究背景及意义，并说明了本文的主要贡献。首先由自然语言处理引出文本匹配这一重要任务，根据使用场景的不同分为三类，介绍了各自的经典任务以及实现方式，总结了当前文本匹配的研究现状，提出了可以利用强化学习的建模文本匹配过程。
 
-第二章从两个方面介绍了国内外研究现状。第一方面是关于文本匹配的相关工作，主要介绍了模，从传统方法到深度到强化学习，另一方面是强化学习的研究现状，主要介绍了强化学习的基本概念、符号定义以及相关算法，为本文之后提出的模型打下基础。
+第二章从两个方面介绍了国内外研究现状。第一方面是关于文本匹配的相关工作，主要介绍了多个文本匹配的经典模型，另一方面是强化学习的研究现状，主要介绍了强化学习的基本概念、符号定义以及相关算法，为本文之后提出的模型打下基础。
 
 第三章介绍了文本匹配问题的特点以及详细描述，引入了强化学习中的马尔可夫决策过程，设计了基于强化学习的文本匹配模型，包括面向文本匹配问题的马尔可夫决策过程状态，以及匹配路径的判别模型。
 
-第四章实现了基于价值迭代方法的文本匹配模型，并在真实数据集上进行了实验，利用通用评价指标，将本算法和其它xx文本匹配模型的实验结果进行了比较，发现在大数据量的情况下表现优异。
+第四章实现了基于价值迭代方法的文本匹配模型，并在真实数据集上进行了实验，利用通用评价指标，将本算法和其它文本匹配模型的实验结果进行了比较，发现在大数据量的情况下表现优异。
 
-第五章针对价值迭代基于贪心的选择方法引入的问题，利用蒙特卡洛树搜索算法对马尔可夫决策过程进行优化求解，根据蒙特卡洛树搜索算法的特点对马尔可夫决策过程的状态进行了调整，并对实验结果进行分析。
+第五章基于值迭代的文本匹配模型是基于贪心的方法，对于语言的组合结构问题可能会出现局部最优解。基于蒙特卡罗树搜索算法设计并实现了文本匹配模型，并与其他经典算法进行了对比。实现结果表明，基于蒙特卡罗树搜索的文本匹配模型具有显著的优势。
 
 第六章对全文进行总结，本文的主要贡献和不足。
 
@@ -230,11 +232,11 @@ MatchSRNN用GRU遍历匹配矩阵，计算了每个门在三个方向上的值�
 \centering
   \includegraphics[width=0.8\linewidth]{figures/interaction.png}
   \caption{主体与环境的交互}
-  \label{fig:LSTM-DSSM}       % Give a unique label
+  \label{fig:interaction}       % Give a unique label
 \vspace{1em}
 \end{figure}
 
-主体和环境的交互可以用图\ref{fig:interaction}表示。主体在当前状态$s_t$下根据策略π选择动作$a_t$，环境接收到该动作并转移到下一状态$s_{t+1}$，主体接收环境反馈回来的奖励选择下一步动作。强化学习不需要监督信号，主要算法包括Q学习（Q-learning），策略梯度（policy gradient）等等。
+主体和环境的交互可以用图\ref{fig:interaction}表示。主体在当前状态$s_t$下根据策略π选择动作$a_t$，环境接收到该动作并转移到下一状态$s_{t+1}$，主体接收环境反馈回来的奖励选择下一步动作。强化学习不需要监督信号，主要算法包括Q学习（Q-learning），价值迭代（Value Iteration）等等。
 
 深度强化学习的主要思路是将神经网络用于抽取复杂高维数据中的信息，并将其映射到一个低维向量空间便于强化学习处理。
 由于卷积神经网络在计算机视觉领域的统治地位，DeepMind团队在2013年尝试将卷积神经网络和强化学习结合，提出来深度Q网络（DeepQ Network，DQN）\cite{Mnih2013PlayingAW}，并成功的将该方法用在了Atari视频游戏。这是深度强化学习首次在高维度的状态空间下起作用。
@@ -280,23 +282,26 @@ AlphaGo Zero的成功证明了在没有任何先验经验的情况下，深度�
 \section{文本匹配描述}
 为了更好地解决文本匹配问题，本节会利用数学符号形式化地定义文本匹配这个任务。
 
-文本匹配任务的输入为两个文本集合和一个标签：$S_1=\{\mathbf{q}_1, \mathbf{q}_2,\cdots,\mathbf{q}_n\}, S_2=\{\mathbf{d}_1, \mathbf{d}_2,\cdots,\mathbf{d}_n\}, L=\{\mathbf{y}_1, \mathbf{y}_2, \cdots, \mathbf{y}_n\}$,
+文本匹配任务的输入为两个文本集合和一个标签：$S_1=\{\mathbf{q}_1, \mathbf{q}_2,\cdots,\mathbf{q}_N\}, S_2=\{\mathbf{d}_1, \mathbf{d}_2,\cdots,\mathbf{d}_N\}, L=\{\mathbf{y}_1, \mathbf{y}_2, \cdots, \mathbf{y}_N\}$,
 %给定训练数据对，两个文本和一个标签： $(\mathbf{q}_1, \mathbf{d}_1, \mathbf{l}_1), (\mathbf{q}_2, \mathbf{d}_2, \mathbf{l}_2), \cdots, (\mathbf{q}_N, \mathbf{d}_N, \mathbf{l}_N)$,
-其中 $\mathbf{q}_i \in \mathbf{Q}$，$\mathbf{d}_i \in \mathbf{D}$为输入的一对文本，$\mathbf{l}_i \in \mathbf{L}$ 为标签，是0或1。在问答系统中，三者分别为问题、答案、答案能否回答问题；在问题复述中，三者分别为要判定是否同义的两个句子和是否同意义；在搜索引擎中，三者分别为查询、文档和是否相关。
+其中 $\mathbf{q}_i = \{\mathbf{u}_1, \mathbf{u}_2, \cdots, \mathbf{u}_m\} \in \mathbf{Q}$，$\mathbf{d}_i = \{\mathbf{v}_1, \mathbf{v}_2, \cdots, \mathbf{v}_n\} \in \mathbf{D}$为输入的一对文本，$\mathbf{l}_i \in \mathbf{L}$ 为标签，是0或1。在问答系统中，三者分别为问题、答案、答案能否回答问题；在问题复述中，三者分别为要判定是否同义的两个句子和是否同意义；在搜索引擎中，三者分别为查询、文档和是否相关。
 
 文本匹配的过程是自动学习训练数据上的匹配模型f，以便对于测试数据的每次输入，可以预测 $\mathbf{q}_i$ 和 $\mathbf{d}_i$ 的匹配程度 $\mathbf{r}_i$ ，可设定一个阈值，若高于该阈值就认为为匹配，低于该阈值就认为不匹配。
 
-在匹配的过程中，有一些关键步骤可以形式化的表述出来，以便之后求解。
+在匹配的过程中，有一些关键步骤可以形式化的表述出来，以便之后求解，如图\ref{fig:deep_text_matching}。
 
 \begin{itemize}
-	\item 单词表达：将每个单词映射到词向量 
-	\item 中间表达：
-	\item 匹配空间：
-	\item 匹配度得分：
+	\item 单词表达（Inputs）： $\mathbf{x}_i = \phi(\mathbf{u}_i), \mathbf{y}_i = \phi(\mathbf{v}_i)$，将每个单词$\mathbf{u}_i, \mathbf{v}_i$映射到词向量$\mathbf{x}_i, \mathbf{y}_i$，整个句子映射后得到矩阵$\mathbf{x}, \mathbf{y}$
+	\item 中间交互（Interaction）：通过函数$\mathbf{p}=\phi (\mathbf{x}), \mathbf{q} = \phi (\mathbf{y})$得到句子的表达。
+	\item 匹配空间（Matching Pattern）：用矩阵$M = f(\mathbf{p}, \mathbf{q})$两个句子交互后的结果。
+	\item 匹配度得分（Similarity）：提取匹配空间的模式信息，并综合前面的其他信息，得到匹配程度的得分。
 \end{itemize}
 
+
+
+
 \section{马尔可夫决策过程}
-强化学习研究的是如何根据环境的反馈，作出行动，从而最大化总收益。详细过程如下：在某一时刻 $t$ ，主体会处于状态 $s_t$，并从环境中得到观测 $o_t$，根据观测和行动利用策略 $\pi_\theta(a_t|o_t)$ 或者 $\pi_\theta(a_t|s_t)$作出行动 $a_t$，环境根据主体状态 $s_t$ 以及行动 $a_t$ 通过转移概率分布函数 $p(s_{t+1}| s_t, a_t)$ 得到状态 $s_{t+1}$，通过奖励函数 $r(s, a)$ 得到奖励 $r_t$，周而复始。而当环境是完全可观测的时候，它通常被形式化的描述为为马尔可夫决策过程（Markov Decision Process，MDP）几乎所有。强化学习中马尔可夫决策过程可以解决大部分问题\cite{Sutton1998ReinFORcementL}，本小节会简要介绍马尔可夫决策过程及相关概念。
+强化学习研究的是如何根据环境的反馈，作出行动，从而最大化总收益。详细过程如下：在某一时刻 $t$ ，主体会处于状态 $s_t$，并从环境中得到观测 $o_t$，根据观测和行动利用策略 $\pi_\theta(a_t|o_t)$ 或者 $\pi_\theta(a_t|s_t)$作出行动 $a_t$，环境根据主体状态 $s_t$ 以及行动 $a_t$ 通过转移概率分布函数 $p(s_{t+1}| s_t, a_t)$ 得到状态 $s_{t+1}$，通过奖励函数 $r(s, a)$ 得到奖励 $r_t$，周而复始。而当环境是完全可观测的时候，它通常被形式化的描述为为马尔可夫决策过程（Markov Decision Process，MDP）。马尔可夫决策过程可以解决大部分强化学习问题\cite{Sutton1998ReinFORcementL}，本小节会简要介绍马尔可夫决策过程及相关概念。
 
 \subsection{马尔科夫相关概念}
 
@@ -398,7 +403,7 @@ v(s) & = \mathbb{E}[G_t|S_t = s] \\
 \end{aligned}
 \end{equation}
 
-~\eqref{eq:Bellman}~被称为Bellman方程\cite{bellman1957markovian}，它表明价值函数可以通过迭代计算得到，马尔可夫决策过程的目的就是通过迭代最大化$v(s)$。
+式~\eqref{eq:Bellman}~被称为Bellman方程\cite{bellman1957markovian}，它表明价值函数可以通过迭代计算得到，马尔可夫决策过程的目的就是通过迭代最大化$v(s)$。
 
 通过Bellman方程，可以得到~\eqref{bellman2}~，通过迭代计算价值函数来优化策略，收敛到最优。
 \begin{equation}\label{bellman2}
@@ -409,6 +414,18 @@ v_{k+1}(s) &= \mathbb{E}[R_{t+1}+\gamma v_k(S_{t+1})|S_t=s]\\
 \end{equation}
 
 策略迭代一般分为策略评 估和策略改进。策略评估（Policy Evaluation）：利用当前策略产生新样本；策略改进（Policy Improvement）：使用新样本更新当前策略，最终收敛到最优。在策略评估时需要知道环境的状态转移概率，因此策略迭代需要依赖模型。
+
+策略迭代算法每次都要进行策略评估和改进，大大增加了算法的训练时间，由于对文本匹配问题对策略的改进和对值函数的改进是一致的，所以可以将策略改进视为对值函数的改进。
+
+通过Bellman方程，我们可以得到：
+\begin{equation}\label{bellman_val}
+	\begin{aligned}
+		v_*(s) &= \mathbb{E}[R_{t+1}+\gamma v_*(S_{t+1})|S_t=s,A_t=a] \\
+			   &= \max_a \sum_{s',r}p(s', r|s, a)[r+\gamma v_k(s')]
+	\end{aligned}
+\end{equation}
+
+从\eqref{bellman_val}可以发现，我们可以通过Bellman最优模型来更新值函数收敛，最后收敛可以得到当前策略的最优值$v_*$。
 
 \begin{algorithm}[H]
     \small
@@ -438,17 +455,9 @@ v_{k+1}(s) &= \mathbb{E}[R_{t+1}+\gamma v_k(S_{t+1})|S_t=s]\\
     \end{algorithmic}
 \end{algorithm}
 
-策略迭代算法每次都要进行策略评估和改进，大大增加了算法的训练时间，由于对文本匹配问题对策略的改进和对值函数的改进是一致的，所以可以将策略改进视为对值函数的改进。
 
-通过Bellman方程，我们可以得到：
-\begin{equation}\label{bellman_val}
-	\begin{aligned}
-		v_*(s) &= \mathbb{E}[R_{t+1}+\gamma v_*(S_{t+1})|S_t=s,A_t=a] \\
-			   &= \max_a \sum_{s',r}p(s', r|s, a)[r+\gamma v_k(s')]
-	\end{aligned}
-\end{equation}
 
-从\eqref{bellman_val}可以发现，我们可以通过Bellman最优模型来更新值函数收敛，最后收敛可以得到当前策略的最优值$v_*$。
+相比于算法~\ref{alg:policy_iteration}~，值迭代算法~\ref{alg:value_iteration}~避免了策略评估部分的计算量，降低了算法的运行时间，有效地提高了算法的运行效率。
 
 \begin{algorithm}[!htbp]
     \small
@@ -470,37 +479,36 @@ v_{k+1}(s) &= \mathbb{E}[R_{t+1}+\gamma v_k(S_{t+1})|S_t=s]\\
 \end{algorithm}
 
 
-
-相比于算法~\ref{alg:policy_iteration}~，值迭代算法~\ref{alg:value_iteration}~避免了策略评估部分的计算量，降低了算法的运行时间，有效地提高了算法的运行效率。
-
-我们发现无论是算法 \ref{alg:policy_iteration} 还是 \ref{alg:value_iteration}，每次都是选择概率或者是值最高的行为，这种策略被称为利用（exploitaion）。与之对应的，如果我们每次都根据概率或者值的分布进行采样（sampling），根据采样的结果采取行动，这种策略被称为探索（exploration）。探索的优势在于当信息匮乏时，可以取得较好的效果；利用的优势在于效率很高，但只有在信息足够充足的情况下才会有效。
+算法 \ref{alg:policy_iteration} 和 \ref{alg:value_iteration}，每次都是选择概率或者是值最高的行为，这种策略被称为利用（exploitaion）。如果我们每次都根据概率或者值的分布进行采样，根据采样的结果采取行动，这种策略被称为探索（exploration）。利用优势在于效率很高，但只有在信息足够充足的情况下才会有效；探索优势在于当信息匮乏时，可以取得较好的效果。
 
 探索和利用各有优势，将二者结合的算法被称为$\epsilon$-贪心算法。我们在每次选择行动的时候，都以$\epsilon$的概率进行探索，以$1-\epsilon$的概率进行利用。可以通过 $\epsilon$ 的调整在算法的不同阶段达到不同的效果。
 
 
 \section{基于强化学习的文本匹配建模}
 \label{sec:TM_MDP}
-本节将强化学习建模为一个强化学习过程。
 
 \subsection{基于马尔可夫决策过程的匹配路径建模}
 
 在\ref{sec:text_matching} 节，中我们介绍了MatchSRNN\cite{Wan2016MatchSRNNMT} 算法。MatchSRNN 使用匹配矩阵中提取句子间的交互信息，利用二维 GRU 提取单个句子和句子之间的序列信息。 在二维 GRU计算完成后，通过二维 GRU 的状态，我们可以回溯出一条路径。
-图\ref{fig:LD_dis}表示了对 $Q$=How to get rid of memory stick error of my sony cyber shot?, $D$=You might want to try to FORmat the memory
-stick but what is the error message you are receiving. 得到的匹配矩阵进行回溯得到的路径，如图\ref{fig:LD_dis}：
-
 \begin{figure}[!htbp]\centering
 \vspace{1em}
-  \includegraphics[width=0.6\linewidth]{figures/LD_dis}
+  \includegraphics[width=0.65\linewidth]{figures/LD_dis}
   \caption{MatchSRNN的回溯路径} 
   \label{fig:LD_dis}       % Give a unique label
   \vspace{1em}
 \end{figure}
 
+
+图\ref{fig:LD_dis}表示了对 $Q$=How to get rid of memory stick error of my sony cyber shot?, $D$=You might want to try to FORmat the memory
+stick but what is the error message you are receiving. 得到的匹配矩阵进行回溯得到的路径。
+
+
+
 既然MatchSRNN通过回溯可以得到一条路径，那么如果不通过二维GRU的方式，直接获得一条路径，利用这条路径判断这两个句子是否匹配，如图\ref{fig:match_MDP}：
 
 \begin{figure}[!htbp]\centering
 \vspace{1em}
-  \includegraphics[width=0.5\linewidth]{figures/match_MDP}
+  \includegraphics[width=0.4\linewidth]{figures/match_MDP}
   \caption{文本匹配路径计算过程} 
   \label{fig:match_MDP}       % Give a unique label
   \vspace{1em}
@@ -530,7 +538,7 @@ stick but what is the error message you are receiving. 得到的匹配矩阵进�
 \end{cases} \\
 	\end{aligned}
 	\end{equation}
-	\begin{equation}\label{MDP_STATE}
+	\begin{equation}\label{MDP_STATE2}
 	\begin{aligned}
 		s_{t+1} = \mathcal{T}(s_t,a_t)=[\mathbf{u}_{q_{t+1}},\mathbf{v}_{d_{t+1}}],[\mathbf{u}_{1+q_{t+1}},\mathbf{v}_{1+d_{t+1}}],\cdots,[\mathbf{u}_{m+q_{t+1}},\mathbf{v}_{m+d_{t+1}}]
 	\end{aligned}
@@ -550,7 +558,7 @@ stick but what is the error message you are receiving. 得到的匹配矩阵进�
 		g(s) = LSTM(Q[q_t: m+q_t], D[d_t: m+d_t])
 	\end{aligned}
 	\end{equation}
-		LSTM网络接受两个长度为 $m$ 的单词序列，计算得到隐状态，计算过程如式：
+		LSTM网络接受两个长度为 $m$ 的单词序列，计算得到隐状态，如式\ref{mdp_LSTM}。
 	\begin{equation}\label{mdp_LSTM}
 	\begin{aligned}
 		f_k &= \sigma(W_f[Q_{k+q_{t}}, D_{k+d_{t}}] + U_fh_{k-1} + b_f) \\
@@ -565,7 +573,7 @@ h_k &= o_k \circ \text{tanh}(c_k)
 
 图 \ref{fig:value_function_input} 以 $Q$ = [The, cat, sat, on, the, mat],$D$ = [The, dog, played, balls, on, the, floor], m=3 为例展示了值函数。当前的状态 $s=[2, 2]$ ，我们将 $Q[2:5]=[\text{sat, on, the}], D[2:5]=[\text{played, balls, on}]$ 的词向量作为 LSTM 的输入，利用 LSTM 捕捉未来词汇的序列信息，计算每个行为的值。
 
-\begin{figure}[!htbp]\centering
+\begin{figure}[h]\centering
 \vspace{1em}
   \includegraphics[width=0.6\linewidth]{figures/match_value_function}
   \caption{文本匹配值函数输入} 
@@ -575,7 +583,7 @@ h_k &= o_k \circ \text{tanh}(c_k)
 
 
 
-获得匹配路径的算法可以被表示为：
+获得匹配路径的算法如算法\ref{alg:MDP_TM}。
 \begin{algorithm}[!htbp]
     \small
     \caption{MDP of Text Match}\label{alg:MDP_TM}
@@ -588,7 +596,7 @@ h_k &= o_k \circ \text{tanh}(c_k)
         \STATE {set $q_1=0, d_2=0$}
         \WHILE {$q_t < \text{len}(\mathbf{s}_1)$ and $d_t < \text{len}(\mathbf{s}_2)$}
         \STATE $a_t = \arg\max_a v(Q [q_t:m+q_t], D [d_t:m+d_t]， a)$
-        \STATE update status according to Eq \ref{eq:status_transfer}
+        \STATE update status according to Eq \ref{eq:MDP_state}
         \STATE Path $\leftarrow$ Path $\oplus [q_t, d_t]$ \COMMENT{$\oplus$ means appends to end}
         \ENDWHILE
     \end{algorithmic}
@@ -600,6 +608,14 @@ h_k &= o_k \circ \text{tanh}(c_k)
 \label{sec:path_classify}
 
 在计算匹配路径之后，我们需要根据路径判断两个句子是否匹配。判别算法以原句子 $Q, D$ 以及对应的路径映射 $m_1 = [q_1, q_2, \cdots, q_t], m_2 = [d_1, d_2, \cdots, d_t]$ 作为输入，判断两个句子是否匹配。
+\begin{figure}[!htbp]
+    \centering
+    \vspace{1em}
+    \includegraphics[width=0.6\textwidth]{path_classify}
+    \caption{匹配路径判定}
+    \label{fig:path_classify}
+    \vspace{1em}
+\end{figure}
 
 我们利用3个LSTM网络作为判别模型，其中 LSTM$_1$ 和 LSTM$_2$ 将 $S_1$ 和 $S_2$ 映射为2个矩阵，LSTM$_c$ 将这两个矩阵映射为一个一维向量 $g_c(s)$:
 $$
@@ -616,16 +632,7 @@ $$
 p = \sigma(<w, g_c(s)> + b)
 \end{equation}
 
-其中 $w$ 和 $b$ 都是需要学习的参数，$\sigma(x) = \frac{1}{1+e^{-x}}$
-LSTM 网络和 \ref{eq:LSTM} 类似, LSTM$_1$  和 LSTM$_2$ 共享参数。
-\begin{figure}[!htbp]
-    \centering
-    \vspace{1em}
-    \includegraphics[width=0.40\textwidth]{path_classify}
-    \caption{匹配路径判定}
-    \label{fig:path_classify}
-    \vspace{1em}
-\end{figure}
+其中 $w$ 和 $b$ 都是需要学习的参数，$\sigma(x) = \frac{1}{1+e^{-x}}$, LSTM$_1$  和 LSTM$_2$ 共享参数。
 
 
 \chapter{基于价值迭代的文本匹配算法实现}
@@ -1039,7 +1046,7 @@ LSTM 网络的定义和公式~\ref{eq:LSTM} 一致，LSTM$_Q$ 和 LSTM$_D$ 共�
 \end{aligned}
 \end{equation}
 
-LSTM$_Q$和LSTM$_D$ 共享参数。最后输出概率会通过 sigmoid 函数变换概率输出：
+LSTM$_Q$和LSTM$_D$ 共享参数。最后概率会通过 sigmoid 函数变换概率输出：
 \begin{equation}
 \label{eq:classification_model}
 p_m = \frac{1}{1+e^{-{\mathbf{g}_c^{\text{out}}}}}
@@ -1130,7 +1137,6 @@ Alg~\ref{alg:TreeSearch} 展示了蒙特卡罗树搜索的细节，其中每一�
 
 
 本章提出的模型的参数 $\Theta_{MCTS}$(包含 $\mathbf{w}, b_v, \mathbf{U}_p$, 以及 LSTM$_D$, LSTM$_Q$ 和 LSTM$_F$中的参数)，$\Theta_{c}$(包含LSTM$_D$, LSTM$_Q$ 和 LSTM$_c$ 中的参数)需要在训练时被更新。在训练阶段，算法接受 $N$ 个标记的句子对 $D = \{ (\mathbf{Q}^{(n)}, \mathbf{D}^{(n)}), \mathbf{Y}\}_{n=1}^{N}$。算法~\ref{alg:Train}展示了整个训练过程。首先将参数  $\Theta_{MCTS}$ 和 $\Theta_{c}$ 初始化为 $[-1, 1]$ 的随机数，每轮迭代时，对于每个句子对 $(\mathbf{Q}, \mathbf{D})$，我们都需要预测一条路径。在每个时间 $t$都会执行一次蒙特卡洛树搜索，并输出策略 $\mathbb{\pi}$，根据策略随机采样出对应的移动方向 $a_t$，直到到达匹配矩阵的右下角。在得到一条路径 $([u_{q_1}, u_{q_2}, \cdots, u_{q_t}], [v_{d_1}, v_{d_2}, \cdots, v_{d_t}])$ 后，使用交叉熵损失更新路径判别模型：
-
 \begin{equation}
 \label{eq:classification_loss}
 \ell_c(Y, p) = -\left(Y\log(p) + (1-Y)\log (1-p)\right)
@@ -1155,7 +1161,7 @@ Alg~\ref{alg:TreeSearch} 展示了蒙特卡罗树搜索的细节，其中每一�
 \STATE \text{Initialize} $\Theta_{MCTS}, \Theta_{c} \leftarrow$ random values in $[-1, 1]$
 \REPEAT
   \FOR{$(\text{all }\mathbf{X}, \mathbf{Y})\in D$}
-    \STATE {$s \leftarrow [\{\mathbf{u}_1\}, \{\mathbf{v}_1\}, \{[\mathbf{u}_1,\mathbf{v}_1], \cdots, [\mathbf{u}_k, \mathbf{v}_k]\}]$}
+    \STATE {$s \leftarrow \{[\mathbf{u}_1,\mathbf{v}_1], \cdots, [\mathbf{u}_k, \mathbf{v}_k]\}$}
     \WHILE{not reach right down corner}
             \STATE $\mathbb{\pi} \leftarrow \mathrm{TreeSearch}(s, V, \mathbf{p}, K)$ \COMMENT{Alg.~(\ref{alg:TreeSearch})}
       \STATE sample action ${a\in\mathcal{A}(s)}$ according to $\pi(a|s)$
@@ -1176,7 +1182,7 @@ Alg~\ref{alg:TreeSearch} 展示了蒙特卡罗树搜索的细节，其中每一�
 \end{algorithm}
 
 
-算法~\ref{alg:Train}展示了模型的推断过程。给定一个句子对 $\mathbf{Q}, \mathbf{D}$，系统的初始化状态 $s_1=[\{\mathbf{u}_1\}, \{\mathbf{v}_1\}, \{[\mathbf{u}_1,\mathbf{v}_1], \cdots, [\mathbf{u}_k, \mathbf{v}_k]$。在每个时间节点 $t$，主体都会得到系统的状态 $s_t=[\mathbf{Q}_t, \mathbf{D}_t, \mathbf{F}_t]$ 以及蒙特卡罗树搜索得到的策略 $\mathbb{\pi}$，根据 $\mathbb{\pi}$ 做出行动后更新当前状态得到 $s_{t+1}$。该过程不断持续直到到达匹配矩阵的右下角。
+算法~\ref{alg:Train}展示了模型的推断过程。给定一个句子对 $\mathbf{Q}, \mathbf{D}$，系统的初始化状态 $s_1=\{[\mathbf{u}_1,\mathbf{v}_1], \cdots, [\mathbf{u}_k, \mathbf{v}_k]\}$。在每个时间节点 $t$，主体都会得到系统的状态 $s_t=[\mathbf{Q}_t, \mathbf{D}_t, \mathbf{F}_t]$ 以及蒙特卡罗树搜索得到的策略 $\mathbb{\pi}$，根据 $\mathbb{\pi}$ 做出行动后更新当前状态得到 $s_{t+1}$。该过程不断持续直到到达匹配矩阵的右下角。
 
 \begin{algorithm}[!htbp]
 \caption{Text MM-Match}\label{alg:RLRank_MCTS}
@@ -1199,10 +1205,10 @@ Alg~\ref{alg:TreeSearch} 展示了蒙特卡罗树搜索的细节，其中每一�
 
 
 \section{实验分析}
-为了对我们提出的基于蒙特卡罗树搜索的文本匹配算法有效性进行评估，我们利用 Quora 的问题匹配数据集进行了测试。实验设置和 \ref{sec:lab_value} 节相同。由于蒙特卡洛树搜索的时间较长，因此我们只在小数据集上进行的测试。
+为了对我们提出的基于蒙特卡罗树搜索的文本匹配算法有效性进行评估，我们利用 Quora 的问题匹配数据集进行了测试。实验设置和 \ref{sec:lab_value} 节相同。由于蒙特卡洛树搜索的时间较长，我们只在小数据集上进行的测试。表\ref{tab:MCTS_small_test}可以发现MM-Match在3个评价指标上均大幅度领先于 MatchPyramid 和 MatchSRNN。从收敛速度上来看，我们的算法继承了算法\ref{alg:value_iteration} 的优点，收敛速度同样很快。类似的，我们也在上面实验中的一折数据上统计了验证集和测试集的auc随轮数的变化情况。观察图\ref{fig:MCTS_line} 可以发现，MM-Match 的收敛速度明显快于 VIM，算法在20轮不到就已经收敛。
 \begin{table}[htbp]
 \caption{基于蒙特卡罗树搜索的文本匹配算法测试结果}\label{tab:MCTS_small_test}
-\vspace{0.5em}\centering\wuhao
+\vspace{0.5em}\centering
 \begin{tabular}{ccccc}
 \toprule[1.5pt]
 	\multirow{2}{*}{Algorithm} &
@@ -1217,22 +1223,18 @@ Alg~\ref{alg:TreeSearch} 展示了蒙特卡罗树搜索的细节，其中每一�
 \vspace{\baselineskip}
 \end{table}
 
-可以发现MM-Match在3个评价指标上均大幅度领先于 MatchPyramid 和 MatchSRNN。
 
-从收敛速度上来看，我们的算法继承了算法\ref{alg:TM_train} 的优点，收敛速度同样很快。类似的，我们也在上面实验中的一折数据上统计了验证集和测试集的auc随轮数的变化情况：
 
 \begin{figure}[!htbp]
 \vspace{1em}
 \centering
-  \includegraphics[width=0.8\linewidth]{figures/MCTS_line}
+  \includegraphics[width=0.7\linewidth]{figures/MCTS_line}
   \caption{MM-Match 树搜索节点访问次数}
   \label{fig:MCTS_line}       % Give a unique label
 \vspace{1em}
 \end{figure}
-x
-观察图\ref{fig:MCTS_line} 可以发现，MM-Match 的收敛速度明显快于 VIM，算法在20轮不到就已经收敛。
 
-为了实际查看蒙特卡罗树搜索访问的节点，我们将算法 \ref{alg:TreeSearch} 访问节点数可视化：
+为了实际查看蒙特卡罗树搜索访问的节点，将算法 \ref{alg:TreeSearch} 树搜索节点访问次数可视化，如图 \ref{fig:MCTS_exp_path} 是在输入的句子对为 How do I think positive in life? What is the best way to a positive life? 的情况下第一次树搜索后各个节点的访问次数，可以发现右上角和左下角明显为空，而对角线处的访问次数明显最高。
 
 \begin{figure}[!htbp]
 \vspace{1em}
@@ -1243,25 +1245,20 @@ x
 \vspace{1em}
 \end{figure}
 
-图 \ref{fig:MCTS_exp_path} 是在输入的句子对为 How do I think positive in life? What is the best way to a positive life 的情况下第一次树搜索后各个节点的访问次数，可以发现右上角和左下角明显为空，而对角线处的访问次数明显最高。
+
 
 \section{本章小结}
-本章主要介绍了基于蒙特卡罗树搜索的文本匹配算法。首先我们对上一章提出的 MDP 进行了改进，加入了路径信息。路径信息的引入使得价值网络的预测更加精确。
-
+本章主要介绍了基于蒙特卡罗树搜索的文本匹配算法。首先我们对上一章提出的 MDP 进行了改进，加入了路径信息,使得价值网络的预测更加精确。
 为了解决直接使用价值网络输出的值函数会导致算法陷入局部最优解的问题，本章引入了蒙特卡罗树搜索算法，通过蒙特卡罗树搜索算法增强搜索策略的可用性，也解决了文本匹配中由于语言组合结构带来的语义区分问题。
-
 最后本文在quora数据集上进行了测试，实验结果表明本文提出的模型具有优异的性能。
 
 \chapter{总结与展望}
 近年来，计算机以及智能终端设备的存储和计算能力不断增强，互联网的信息量呈现爆炸式增长。信息量的增加既为人们的生活带来了便捷，也给人们提出了巨大的挑战。据统计，google每天新增的索引网页页数高达40亿。在海量的信息面前如何高效的获取信息以及如何去除冗余信息成了很多人需要面对的问题。
 
-文本是人类数千年历史中主要的信息载体。虽然移动互联网时代的到来大大方便了视频和音频的传播，但是文本依然是人类目前最普遍和高效的信息获取手段。文本匹配作为信息检索和冗余文本消除的基础技术手段，一直受到学术界和工业界的高度重视。
-
-根据使用场景的不同，文本匹配可以被分为三类：短文本-短文本匹配，短文本-长文本匹配以及长文本-长文本匹配。短文本-短文本的匹配主要用于问答系统、问题复述等领域，先得到句子的矩阵表示后，利用深度网络提取句子的语义信息以及句子间的交互信息，将提取出的信息映射为一个概率分布；短文本-长文本的匹配往往需要用到主题模型等辅助，根据长文本的主题分布判断生成短文本的概率；长文本-长文本的匹配相对较少，同样需要利用主题模型等手段将长文本映射到一个高维向量空间，通过高维向量空间的距离衡量两个文本的相似度。
 
 一个优秀的文本匹配算法一般需要解决三个问题：1) 语言的多义性问题，即相同词语在不同环境下的语义问题；2) 语言的组合结构问题，即相同词语的顺序不同导致的语义不同；3) 匹配的非对称性问题，文本匹配任务中两个句子并不需要语义或者结构一致，如问答系统。
 
-为了解决这些问题，近年来有学者试图将深度学习应用于文本匹配任务，取得了巨大的成功。但是这些方法都试图利用深度学习抽取文本中的语义信息，目前对于计算机来说这仍然是不可能的任务，因此基于深度学习的方法具有天然的局限性。
+近年来有学者试图将深度学习应用于文本匹配任务，取得了巨大的成功。但是这些方法都试图利用深度学习抽取文本中的语义信息，目前对于计算机来说这仍然是不可能的任务，因此基于深度学习的方法具有天然的局限性。
 
 为了解决上述问题，文本利用强化学习抽取匹配过程中句子之间的交互信息。本文从三个角度出发，解决了利用强化学习抽取交互信息的主要难题。首先，本文针对于文本匹配的场景，利用马尔科夫决策过程建模匹配过程中路径的生成过程，利用值迭代方法对马尔科夫决策过程进行训练和预测，验证了马尔科夫决策过程的正确性；并且，利用蒙特卡罗树搜索向前看的特性解决文本匹配的组合结构问题，取得了良好的效果。
 
