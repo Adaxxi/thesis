@@ -7,7 +7,8 @@
 %\setcounter{page}{1}       % 如果需要从该页开始从 1 开始编页，则取消该注释
 \markboth{外文资料}{外文资料}
 \chapter*{外文资料}
-
+\thispagestyle{empty}
+\pagestyle{empty}
 \textbf{Abstract}
 
 Semantic matching, which aims to determine the matching degree between two texts, is a fundamental problem for many NLP applications. Recently, deep learning approach has been applied to this problem and significant improvements have been achieved. In this paper, we propose to view the generation of the global interaction between two texts as a recursive process: i.e.~the interaction of two texts at each position is a composition of the interactions between their prefixes as well as the word level interaction at the current position. Based on this idea, we propose a novel deep architecture, namely Match-SRNN, to model the recursive matching structure. Firstly, a tensor is constructed to capture the word level interactions. Then a spatial RNN is applied to integrate the local interactions recursively, with importance determined by four types of gates. Finally, the matching score is calculated based on the global interaction. We show that, after degenerated to the exact matching scenario, Match-SRNN can approximate the dynamic programming process of longest common subsequence. Thus, there exists a clear interpretation for Match-SRNN. Our experiments on two semantic matching tasks showed the effectiveness of Match-SRNN, and its ability of visualizing the learned matching structure.
@@ -91,11 +92,12 @@ The interaction can also be represented as a similarity score, such as cosine. W
 \textbf{Spatial RNN}
 The second step of Match-SRNN is to apply a spatial RNN to the word level interaction tensor. Spatial RNN, also referred to as two dimensional RNN (2D-RNN), is a special case of multi-dimensional RNN \cite{DBLP:journals/corr/abs-0705-2011,graves2009offline,theis2015generative}. According to spatial RNN, given the representations of interactions between prefixes $S_1[1{:}i{-}1]\!{\sim}\! S_2[1{:}j]$, $S_1[1{:}i]\!{\sim}\! S_2[1{:}j{-}1]$ and $S_1[1{:}i{-}1]\!{\sim}\! S_2[1{:}j{-}1]$, denoted as $\vec{h}_{i-1,j},\vec{h}_{i,j-1}$, and $\vec{h}_{i-1,j-1}$, respectively, the interaction between prefixes $S_1[1{:}i]$ and $S_2[1{:}j]$ can be represented as follows:
 \begin{equation}
+\label{eq:RecursiveMatchStruct}
 \vec{h}_{ij}=f(\vec{h}_{i-1,j},\vec{h}_{i,j-1},\vec{h}_{i-1,j-1},\vec{s}_{ij}).
 \end{equation}
 Therefore we can see that spatial RNN can naturally model the recursive matching structure defined in Equation~(\ref{eq:RecursiveMatchStruct}).
 
-For function $f$, we have different choices. The basic RNN usually uses a non-linear full connection layer as $f$. This type of function is easy for computing while often suffers from the gradient vanishing and exploding problem. Therefore, many variants of RNN has been proposed, such as Long Short Term Memory (LSTM), Gated Recurrent Units (GRU) and Grid LSTM ~\cite{DBLP:journals/corr/KalchbrennerDG15}. Here, we adopt GRU since it is easy to implement and has close relationship with LCS as discussed in the following sections.
+For function $f$, we have different choices. The basic RNN usually uses a non-linear full connection layer as $f$. This type of function is easy for computing while often suffers from the gradient vanishing and exploding problem. Therefore, many variants of RNN has been proposed, such as Long Short Term Memory (LSTM), Gated Recurrent Units (GRU) and Grid LSTM. Here, we adopt GRU since it is easy to implement and has close relationship with LCS as discussed in the following sections.
 
 GRU is proposed to utilize several gates to tackle the aforementioned problems of basic RNN, and has shown excellent performance for tasks such as machine translation. In this paper, we extend traditional GRU for sequences (1D-GRU) to spatial GRU. % \footnote{LSTM can also be used, and similar experimental results can be obtained. We omit them due to the space limitation.}.
 Figure~\ref{fig:GRU} describes clearly about the extensions.
